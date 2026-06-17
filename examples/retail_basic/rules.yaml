@@ -1,0 +1,77 @@
+rules:
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_order_id_not_null
+      severity: critical
+      domain: retail
+      owner: data-platform
+      tags: [completeness, orders]
+      description: Every order must have a non-null order_id
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "ETL pipeline failed mid-load"
+        - "Source system sent partial records"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_revenue_positive
+      severity: high
+      domain: retail
+      owner: revenue-team
+      tags: [revenue, validity]
+      description: Revenue must be non-negative on all order records
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: sql_expression
+      expression: "revenue >= 0"
+    diagnosis:
+      common_causes:
+        - "Refund logic inverted sign"
+        - "Currency conversion failure"
+        - "Test data leaked to prod"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_minimum_rows
+      severity: medium
+      domain: retail
+      owner: data-platform
+      tags: [volume, orders]
+      description: The orders table should have at least 1 row
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: row_count
+      threshold: 1
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_order_id_unique
+      severity: high
+      domain: retail
+      owner: data-platform
+      tags: [uniqueness, orders]
+      description: order_id must be unique across all orders
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: unique
+    diagnosis:
+      common_causes:
+        - "Duplicate records inserted by idempotency bug"
+        - "Replication lag caused double-write"

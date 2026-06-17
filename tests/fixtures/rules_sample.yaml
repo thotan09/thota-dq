@@ -1,0 +1,115 @@
+rules:
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_no_null_order_id
+      severity: critical
+      domain: retail
+      description: Every order must have a non-null order_id
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: not_null
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_unique_order_id
+      severity: critical
+      domain: retail
+      description: order_id must be unique across all orders
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: unique
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_positive_revenue
+      severity: high
+      domain: retail
+      description: Revenue must be non-negative
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: sql_expression
+      expression: "revenue >= 0"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_row_count_min
+      severity: medium
+      domain: retail
+      description: Orders table must have at least 5 rows
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: row_count
+      threshold: 5
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_status_accepted_values
+      severity: high
+      domain: retail
+      description: Order status must be one of the allowed values
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [status]
+    logic:
+      type: accepted_values
+      values: ["pending", "shipped", "delivered", "cancelled"]
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_no_future_order_date
+      severity: medium
+      domain: retail
+      description: order_date must not be in the future
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_date]
+    logic:
+      type: no_future_dates
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_revenue_mean_between
+      severity: low
+      domain: retail
+      description: Average order revenue should be between $10 and $500
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [revenue]
+    logic:
+      type: mean_between
+      min_value: 10.0
+      max_value: 500.0
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_customer_id_not_null
+      severity: high
+      domain: retail
+      description: customer_id must not be null
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [customer_id]
+    logic:
+      type: not_null

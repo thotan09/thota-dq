@@ -1,0 +1,120 @@
+name: Eval Suite
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # every Monday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      category:
+        description: "Category to run (leave blank for all 100 tasks)"
+        required: false
+        default: ""
+      use_llm:
+        description: "Run with LLM diagnosis (requires ANTHROPIC_API_KEY secret)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write    # needed to push to gh-pages
+  pages: write
+  id-token: write
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]" --quiet
+
+      - name: Run eval suite (no-LLM baseline)
+        id: eval_baseline
+        run: |
+          CATEGORY_ARG=""
+          if [ -n "${{ github.event.inputs.category }}" ]; then
+            CATEGORY_ARG="--category ${{ github.event.inputs.category }}"
+          fi
+          mkdir -p eval-results/baseline
+          python -m aegis_benchmark $CATEGORY_ARG --output eval-results/baseline 2>&1 | tee /tmp/baseline.log
+          echo "baseline_accuracy=$(python -c "import json; d=json.load(open('eval-results/baseline/report.json')); print(d['overall']['accuracy'])")" >> "$GITHUB_OUTPUT"
+        env:
+          PYTHONPATH: .
+
+      - name: Run eval suite (with LLM)
+        if: ${{ github.event.inputs.use_llm == 'true' && secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          CATEGORY_ARG=""
+          if [ -n "${{ github.event.inputs.category }}" ]; then
+            CATEGORY_ARG="--category ${{ github.event.inputs.category }}"
+          fi
+          mkdir -p eval-results/llm
+          python -m aegis_benchmark --llm $CATEGORY_ARG --output eval-results/llm 2>&1
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONPATH: .
+
+      - name: Build GitHub Pages index
+        run: |
+          mkdir -p gh-pages
+          cp eval-results/baseline/report.html gh-pages/index.html
+          if [ -f eval-results/llm/report.html ]; then
+            cp eval-results/llm/report.html gh-pages/llm.html
+          fi
+          cp eval-results/baseline/report.json gh-pages/report.json
+          # Write a tiny badge JSON consumed by shields.io endpoint badge
+          ACCURACY="${{ steps.eval_baseline.outputs.baseline_accuracy }}"
+          python -c "
+          import json, sys
+          acc = float('$ACCURACY')
+          color = 'brightgreen' if acc >= 0.95 else 'yellow' if acc >= 0.80 else 'red'
+          badge = {'schemaVersion': 1, 'label': 'eval accuracy', 'message': f'{acc:.1%}', 'color': color}
+          json.dump(badge, open('gh-pages/badge.json', 'w'))
+          "
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
+          commit_message: "eval: weekly report ${{ github.run_id }}"
+
+      - name: Upload eval artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.run_id }}
+          path: eval-results/
+          retention-days: 90
+
+      - name: Print summary
+        run: |
+          echo "## Eval Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          python -c "
+          import json
+          d = json.load(open('eval-results/baseline/report.json'))
+          ov = d['overall']
+          print(f'| Metric | Value |')
+          print(f'|--------|-------|')
+          print(f'| Tasks | {d[\"total_tasks\"]} |')
+          print(f'| Accuracy | {ov[\"accuracy\"]:.1%} |')
+          print(f'| F1 | {ov[\"f1\"]:.3f} |')
+          print(f'| Precision | {ov[\"precision\"]:.3f} |')
+          print(f'| Recall | {ov[\"recall\"]:.3f} |')
+          print(f'| Total Cost | \${ov[\"total_cost_usd\"]:.4f} |')
+          print(f'| Avg Latency | {ov[\"avg_latency_ms\"]:.0f} ms |')
+          print()
+          print('### Per-Category')
+          print()
+          print('| Category | Tasks | Accuracy | F1 |')
+          print('|----------|-------|----------|----|')
+          for cat, cm in d['per_category'].items():
+              print(f'| {cat} | {cm[\"total\"]} | {cm[\"accuracy\"]:.1%} | {cm[\"f1\"]:.3f} |')
+          " >> $GITHUB_STEP_SUMMARY
+        env:
+          PYTHONPATH: .

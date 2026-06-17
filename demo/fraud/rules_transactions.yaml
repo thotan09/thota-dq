@@ -1,0 +1,271 @@
+rules:
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_txn_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - txn_id
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: unique
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_txn_id_unique
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - txn_id
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    expression: amount_usd > 0
+    type: sql_expression
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_amount_usd_positive
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - pending
+    - settled
+    - reversed
+    - flagged
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_status_valid_values
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - status
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - debit
+    - credit
+    - wire
+    - ach
+    - internal
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_txn_type_valid_values
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - txn_type
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: 'SELECT t.txn_id, t.account_id, t.amount_usd
+
+      FROM transactions t
+
+      LEFT JOIN compliance_flags cf ON cf.txn_id = t.txn_id AND cf.flag_type = ''CTR''
+
+      WHERE t.amount_usd >= 10000 AND cf.flag_id IS NULL
+
+      '
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_ctr_filing_required
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "WITH structuring_window AS (\n  SELECT\n    account_id,\n    COUNT(*)\
+      \ as txn_count\n  FROM transactions\n  WHERE amount_usd BETWEEN 9000 AND 9999\n\
+      \  GROUP BY account_id, DATE_TRUNC('day', txn_timestamp)\n  HAVING COUNT(*)\
+      \ >= 3\n)\nSELECT DISTINCT t.txn_id, t.account_id, t.amount_usd\nFROM transactions\
+      \ t\nINNER JOIN structuring_window sw ON t.account_id = sw.account_id\nLEFT\
+      \ JOIN compliance_flags cf ON cf.account_id = t.account_id AND cf.flag_type\
+      \ = 'STRUCTURING'\nWHERE t.amount_usd BETWEEN 9000 AND 9999\n  AND cf.flag_id\
+      \ IS NULL\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_structuring_detection
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "SELECT t.txn_id, t.account_id, t.counterparty_id, cp.name\nFROM transactions\
+      \ t\nINNER JOIN counterparties cp ON t.counterparty_id = cp.counterparty_id\n\
+      INNER JOIN sanctions_list sl ON cp.name = sl.name\nWHERE (t.status = 'settled'\
+      \ OR t.status = 'pending')\n  AND sl.delisted_at IS NULL\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_ofac_sanctions_screening
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: 'SELECT t.txn_id, t.account_id, t.amount_usd
+
+      FROM transactions t
+
+      INNER JOIN accounts a ON t.account_id = a.account_id
+
+      INNER JOIN customers c ON a.customer_id = c.customer_id
+
+      LEFT JOIN compliance_flags cf ON cf.txn_id = t.txn_id AND cf.flag_type = ''SAR''
+
+      WHERE t.amount_usd >= 5000 AND c.pep_flag = TRUE AND cf.flag_id IS NULL
+
+      '
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_pep_sar_required
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "WITH velocity_window AS (\n  SELECT t1.txn_id, t1.account_id, COUNT(t2.txn_id)\
+      \ as txn_count\n  FROM transactions t1\n  INNER JOIN transactions t2 ON t1.account_id\
+      \ = t2.account_id\n    AND t2.txn_timestamp >= t1.txn_timestamp - INTERVAL '60\
+      \ minutes'\n    AND t2.txn_timestamp <= t1.txn_timestamp\n  GROUP BY t1.txn_id,\
+      \ t1.account_id\n  HAVING COUNT(t2.txn_id) > 10\n)\nSELECT DISTINCT txn_id,\
+      \ account_id FROM velocity_window\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_velocity_breach
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "SELECT t.txn_id, t.account_id, a.last_activity_date, t.amount_usd\nFROM\
+      \ transactions t\nINNER JOIN accounts a ON t.account_id = a.account_id\nLEFT\
+      \ JOIN compliance_flags cf ON cf.txn_id = t.txn_id AND cf.flag_type = 'MANUAL_REVIEW'\n\
+      WHERE date_diff('day', a.last_activity_date, CAST(t.txn_timestamp AS DATE))\
+      \ > 180\n  AND t.amount_usd > 1000\n  AND cf.flag_id IS NULL\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_dormant_reactivation_large_wire
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "SELECT t.txn_id, t.account_id, a.opened_date, t.amount_usd\nFROM transactions\
+      \ t\nINNER JOIN accounts a ON t.account_id = a.account_id\nWHERE t.txn_type\
+      \ = 'wire'\n  AND t.amount_usd > 5000\n  AND date_diff('day', a.opened_date,\
+      \ CAST(t.txn_timestamp AS DATE)) < 30\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_new_account_large_wire
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "WITH daily_round_amounts AS (\n  SELECT \n    t.account_id,\n    CAST(t.txn_timestamp\
+      \ AS DATE) as txn_date,\n    COUNT(*) as total_txns,\n    SUM(CASE WHEN MOD(t.amount_usd,\
+      \ 1000) = 0 THEN 1 ELSE 0 END) as round_txns\n  FROM transactions t\n  GROUP\
+      \ BY t.account_id, CAST(t.txn_timestamp AS DATE)\n  HAVING SUM(CASE WHEN MOD(t.amount_usd,\
+      \ 1000) = 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) > 40\n)\nSELECT DISTINCT t.txn_id,\
+      \ t.account_id\nFROM transactions t\nINNER JOIN daily_round_amounts dra ON t.account_id\
+      \ = dra.account_id\n  AND CAST(t.txn_timestamp AS DATE) = dra.txn_date\n  AND\
+      \ MOD(t.amount_usd, 1000) = 0\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_round_amount_concentration
+    severity: medium
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "WITH counterparty_volumes AS (\n  SELECT \n    t.account_id,\n    t.counterparty_id,\n\
+      \    SUM(t.amount_usd) as counterparty_total,\n    SUM(SUM(t.amount_usd)) OVER\
+      \ (PARTITION BY t.account_id) as account_total\n  FROM transactions t\n  WHERE\
+      \ t.txn_timestamp >= CURRENT_TIMESTAMP - INTERVAL '7 days'\n  GROUP BY t.account_id,\
+      \ t.counterparty_id\n)\nSELECT DISTINCT t.txn_id, t.account_id, t.counterparty_id\n\
+      FROM transactions t\nINNER JOIN counterparty_volumes cv ON t.account_id = cv.account_id\
+      \ \n  AND t.counterparty_id = cv.counterparty_id\nWHERE cv.counterparty_total\
+      \ * 100.0 / cv.account_total > 60\n  AND t.txn_timestamp >= CURRENT_TIMESTAMP\
+      \ - INTERVAL '7 days'\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_counterparty_concentration
+    severity: medium
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "SELECT t.txn_id, t.account_id, t.country_code, c.country_of_residence\n\
+      FROM transactions t\nINNER JOIN accounts a ON t.account_id = a.account_id\n\
+      INNER JOIN customers c ON a.customer_id = c.customer_id\nWHERE t.country_code\
+      \ != c.country_of_residence\n  AND a.international_travel_flag = FALSE"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: transactions_geographic_mismatch
+    severity: medium
+    status: draft
+    version: 1.0.0
+  scope:
+    table: transactions

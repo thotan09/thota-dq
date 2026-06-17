@@ -1,0 +1,123 @@
+rules:
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_entry_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - entry_id
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: unique
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_entry_id_unique
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - entry_id
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_name_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - name
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_country_code_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - country_code
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - OFAC_SDN
+    - EU
+    - UN
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_list_type_valid_values
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - list_type
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    expression: delisted_at IS NULL OR delisted_at > listed_at
+    type: sql_expression
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_delisted_at_after_listed_at
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    max_rows: null
+    min_rows: 1
+    type: row_count_between
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_active_entries_required
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: sanctions_list
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: 'SELECT name, COUNT(*) as occurrence_count
+
+      FROM sanctions_list
+
+      WHERE delisted_at IS NULL
+
+      GROUP BY name
+
+      HAVING COUNT(*) > 1'
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: sanctions_list_duplicate_active_names
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: sanctions_list

@@ -1,0 +1,218 @@
+rules:
+
+  # ── ORDERS ─────────────────────────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_order_id_not_null
+      severity: critical
+      domain: retail
+      owner: data-platform
+      tags: [completeness, orders]
+      description: Every order must have an order_id
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - ETL pipeline failed mid-load and wrote partial records
+        - Source system sent records without generating a primary key
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_revenue_non_negative
+      severity: high
+      domain: retail
+      owner: revenue-team
+      tags: [validity, revenue]
+      description: Revenue must be >= 0 (refunds are tracked separately)
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: sql_expression
+      expression: "revenue >= 0"
+    diagnosis:
+      common_causes:
+        - Refund logic inverted the sign instead of using the refunds table
+        - Currency conversion failure produced a negative value
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_quantity_positive
+      severity: high
+      domain: retail
+      tags: [validity, orders]
+      description: Quantity must be >= 1
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: sql_expression
+      expression: "quantity >= 1"
+    diagnosis:
+      common_causes:
+        - Cancelled orders incorrectly set quantity to 0 instead of using status='cancelled'
+        - UI allows 0-quantity submissions in edge cases
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_no_future_dates
+      severity: medium
+      domain: retail
+      tags: [validity, timeliness]
+      description: Order dates should not be in the future
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: sql_expression
+      expression: "order_date <= current_date"
+    diagnosis:
+      common_causes:
+        - Pre-orders being loaded incorrectly
+        - Timezone conversion bug shifted dates forward
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_minimum_daily_volume
+      severity: medium
+      domain: retail
+      tags: [completeness, freshness]
+      description: Orders table must have at least 5 rows (sanity check)
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: row_count
+      threshold: 5
+
+  # ── CUSTOMERS ──────────────────────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: customers_email_not_null
+      severity: high
+      domain: retail
+      owner: crm-team
+      tags: [completeness, customers]
+      description: Every customer must have an email address
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [email]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - Guest checkout flow does not require email
+        - CRM migration left legacy records without email
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: customers_email_unique
+      severity: high
+      domain: retail
+      owner: crm-team
+      tags: [uniqueness, customers]
+      description: Email addresses must be unique across customers
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [email]
+    logic:
+      type: unique
+    diagnosis:
+      common_causes:
+        - Duplicate account creation via different sign-up flows
+        - Merge/dedup job failed to consolidate records
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: customers_lifetime_value_non_negative
+      severity: medium
+      domain: retail
+      tags: [validity, customers]
+      description: Customer lifetime value must be >= 0
+    scope:
+      warehouse: duckdb
+      table: customers
+    logic:
+      type: sql_expression
+      expression: "lifetime_value >= 0 OR lifetime_value IS NULL"
+    diagnosis:
+      common_causes:
+        - Refund processing subtracted from LTV incorrectly
+        - LTV calculation bug for customers with 100% refund rate
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: customers_no_future_signup
+      severity: low
+      domain: retail
+      tags: [validity, customers]
+      description: Signup dates should not be in the future
+    scope:
+      warehouse: duckdb
+      table: customers
+    logic:
+      type: sql_expression
+      expression: "signup_date <= current_date"
+    diagnosis:
+      common_causes:
+        - Test records loaded into production
+        - Date column populated with wrong field from source system
+
+  # ── PRODUCTS ───────────────────────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: products_sku_not_null
+      severity: critical
+      domain: retail
+      owner: catalog-team
+      tags: [completeness, products]
+      description: Every product must have a SKU
+    scope:
+      warehouse: duckdb
+      table: products
+      columns: [sku]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - Product created in PIM before SKU was assigned
+        - Draft products accidentally synced to production
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: products_price_positive
+      severity: high
+      domain: retail
+      owner: catalog-team
+      tags: [validity, products]
+      description: Product prices must be >= 0
+    scope:
+      warehouse: duckdb
+      table: products
+    logic:
+      type: sql_expression
+      expression: "price >= 0"
+    diagnosis:
+      common_causes:
+        - Promotional discount applied as absolute subtraction instead of percentage
+        - Manual data entry error

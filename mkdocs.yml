@@ -1,0 +1,103 @@
+site_name: Thota DQ
+site_description: Open, audit-grade agentic data quality framework
+site_url: https://github.com/thotan09/thota-dq
+repo_url: https://github.com/thotan09/thota-dq
+repo_name: thotan09/thota-dq
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  logo: assets/logo_small.png
+  favicon: assets/logo_small.png
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - navigation.breadcrumbs
+    - navigation.footer
+    - navigation.tracking
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+
+  - Overview:
+    - Quickstart: getting-started.md
+    - Architecture: architecture.md
+
+  - Rules:
+    - Rule Schema Reference: rule-schema-reference.md
+
+  - Integrations:
+    - Hermes: integrations/hermes.md
+    - MCP Clients: integrations/mcp-clients.md
+    - MCP Server Reference: integrations/mcp.md
+    - dbt: integrations/dbt.md
+    - Airflow: integrations/airflow.md
+    - GitHub Actions: integrations/github-actions.md
+
+  - Reference:
+    - CLI Reference: cli-reference.md
+    - Audit Trail: audit-trail.md
+    - vs Competitors: vs-competitors.md
+
+  - Community:
+    - Contributing: contributing.md
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+extra:
+  announcement: "🚀 <strong>v0.7.0</strong> — Pipeline manifests, Hermes MCP integration, multi-warehouse Airflow operator. <a href='https://github.com/thotan09/thota-dq/releases'>What's new →</a>"
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/thotan09/thota-dq
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/thota-dq/
+
+copyright: Copyright &copy; 2026 Naveen Thota — Apache 2.0

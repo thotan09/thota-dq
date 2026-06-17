@@ -1,0 +1,248 @@
+{
+  "run_id": "b11de897-d786-4e16-a1bc-e02b5ae96706",
+  "timestamp": "2026-05-14T02:15:46.582406+00:00",
+  "triggered_by": "cli_with_llm_diagnosis",
+  "llm_provider": "anthropic",
+  "llm_model": "claude-haiku-4-5-20251001",
+  "policy_context": {
+    "policy_file": "policy.md",
+    "schema_file": "schema.md",
+    "compliance_tiers": [
+      "Tier 1 \u2014 Regulatory (Zero Tolerance, Critical Severity)",
+      "Tier 2 \u2014 Fraud Signals (High Severity)",
+      "Tier 3 \u2014 Anomaly Signals (Medium Severity)",
+      "Tier 4 \u2014 KYC / Data Completeness (Baseline)"
+    ]
+  },
+  "summary": {
+    "total_rules_checked": 55,
+    "passed": 44,
+    "failed": 11,
+    "pass_rate": 80.0,
+    "severity_breakdown": {
+      "critical": 11,
+      "high": 0,
+      "medium": 0
+    }
+  },
+  "findings_by_severity": {
+    "CRITICAL": [
+      {
+        "rule_id": "counterparties_name_ofac_sanctions_check",
+        "diagnosis": {
+          "plain_english_explanation": "A counterparty entity's name matches an active entry on the OFAC Specially Designated Nationals (SDN) sanctions list. This is a critical compliance violation that blocks all financial transactions.",
+          "regulation_citation": "OFAC SDN List enforcement \u2014 31 C.F.R. Parts 500-598. Executive Order 13224 (Blocking Property and Prohibiting Transactions with Persons Who Commit, Threaten to Commit, or Support Terrorism).",
+          "severity_classification": "CRITICAL",
+          "business_risk_summary": "Immediate transaction block required. Violation of U.S. Treasury Department restrictions. Risk of criminal prosecution and asset seizure.",
+          "penalty_exposure": "$250,000 - $1,000,000 per violation. Criminal penalties: up to 20 years imprisonment and $1,000,000 fine per count.",
+          "remediation_action": "Immediately freeze the counterparty account. Conduct enhanced due diligence (EDD) and sanctions screening. File Suspicious Activity Report (SAR) with FinCEN within 30 days. Do not process any transactions until cleared by legal and compliance.",
+          "rows_affected_count": 2,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_ctr_filing_required",
+        "diagnosis": {
+          "plain_english_explanation": "A single transaction exceeds $10,000 USD but has no corresponding Currency Transaction Report (CTR) filed within 24 hours. CTRs are mandatory federal filings for large cash and wire transactions.",
+          "regulation_citation": "Bank Secrecy Act (BSA) \u2014 31 U.S.C. \u00a7 5313. Internal Revenue Service (IRS) Form 8300 / FinCEN Form 104 (Currency Transaction Report).",
+          "severity_classification": "CRITICAL",
+          "business_risk_summary": "Breach of mandatory federal reporting requirements. Each unfiled transaction is a separate violation. Bank is liable for civil and criminal penalties.",
+          "penalty_exposure": "$25,000 per violation per day of non-compliance. Criminal penalties: up to 5 years imprisonment, $250,000 fine per violation.",
+          "remediation_action": "File CTR immediately (Form 104) with FinCEN for all transactions \u2265$10,000. Set up automated CTR generation system. Implement real-time transaction monitoring. Update compliance procedures to flag large transactions within 1 hour.",
+          "rows_affected_count": 8,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_ofac_sanctions_screening",
+        "diagnosis": {
+          "plain_english_explanation": "A transaction involves a counterparty whose entity is listed on the OFAC SDN list. Transactions with sanctioned entities are prohibited regardless of transaction size or type.",
+          "regulation_citation": "OFAC SDN List enforcement \u2014 31 C.F.R. \u00a7 501.806 (Blocking of Designated Nationals and Designated Resident Aliens). Executive Order 13606.",
+          "severity_classification": "CRITICAL",
+          "business_risk_summary": "Complete prohibition on transaction processing. Transactions must be blocked immediately. Violation results in license-threatening enforcement action.",
+          "penalty_exposure": "$1,000,000+ per violation. Administrative fines, license revocation, criminal prosecution.",
+          "remediation_action": "Block transaction immediately. Freeze all counterparty accounts. Report to OFAC within 10 business days of discovery. Conduct comprehensive sanctions screening of all existing counterparties and transactions.",
+          "rows_affected_count": 2,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_pep_sar_required",
+        "diagnosis": {
+          "plain_english_explanation": "A transaction of $5,000 or more involves a customer flagged as a Politically Exposed Person (PEP), but no Suspicious Activity Report (SAR) has been filed. PEPs require heightened due diligence and suspicious activity documentation.",
+          "regulation_citation": "FinCEN guidance FIN-2012-G003 (Politically Exposed Persons). 31 U.S.C. \u00a7 5318(i) (Suspicious Activity Reporting).",
+          "severity_classification": "CRITICAL",
+          "business_risk_summary": "PEP transactions require documented due diligence and SAR filing for any suspicious patterns. Failure to file SAR for large PEP transactions is a BSA violation.",
+          "penalty_exposure": "$25,000 - $100,000 per unfiled SAR. Regulatory action, cease-and-desist orders.",
+          "remediation_action": "File SAR (FinCEN Form 111) within 30 days of detection. Enhanced due diligence (EDD) on PEP account and transaction history. Document legitimate business purpose. Implement quarterly PEP transaction reviews.",
+          "rows_affected_count": 1,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_structuring_detection",
+        "diagnosis": {
+          "plain_english_explanation": "An account shows a pattern of 3+ transactions between $9,000-$9,999 within 24 hours. This is structuring (smurfing) \u2014 deliberately splitting deposits/withdrawals to evade the $10,000 CTR reporting threshold.",
+          "regulation_citation": "Structuring to evade reporting \u2014 31 U.S.C. \u00a7 5324. Domestic structuring statute applies regardless of legality of underlying funds.",
+          "severity_classification": "CRITICAL",
+          "business_risk_summary": "Structuring is a federal crime even if the source funds are legitimate. Criminal prosecution likely. Asset seizure probable. Violates BSA and FinCEN expectations.",
+          "penalty_exposure": "Criminal prosecution: up to 5 years imprisonment, $250,000+ fines, asset forfeiture. Civil penalties: $5,000-$25,000 per structuring transaction.",
+          "remediation_action": "File Suspicious Activity Report (SAR) immediately. Flag account for closure or enhanced monitoring. Review customer's source of funds and business justification. Interview customer or consider account termination. Report to law enforcement if criminal structuring suspected.",
+          "rows_affected_count": 4,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_dormant_reactivation_large_wire",
+        "diagnosis": {
+          "plain_english_explanation": "An account that has been dormant (no activity for 180+ days) suddenly initiates a large wire transfer (>$1,000). Dormant account reactivation is a common money mule indicator and fraud risk pattern.",
+          "regulation_citation": "FinCEN guidance on dormant accounts and reactivation risk. BSA rule 31 U.S.C. \u00a7 5318 (due diligence and suspicious activity monitoring).",
+          "severity_classification": "HIGH",
+          "business_risk_summary": "High indicator of account compromise, money laundering, or fraud. Account takeover likely if legitimate customer would not reactivate dormant account with large wires.",
+          "penalty_exposure": "$25,000-$100,000 for failure to identify and file SAR on suspicious reactivation. Regulatory enforcement action.",
+          "remediation_action": "Contact customer to verify wire legitimacy and reason for reactivation. Conduct enhanced due diligence on account. Consider filing SAR if customer cannot provide satisfactory explanation. Implement transaction monitoring on reactivated accounts.",
+          "rows_affected_count": 1,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_new_account_large_wire",
+        "diagnosis": {
+          "plain_english_explanation": "A newly opened account (less than 30 days old) is initiating a wire transfer exceeding $5,000. This is a classic fraud pattern: open account, immediately wire out large sum, then abandon/close account.",
+          "regulation_citation": "FinCEN guidance on new account risk. BSA \u00a75318 requiring risk-based customer due diligence and transaction monitoring.",
+          "severity_classification": "HIGH",
+          "business_risk_summary": "Primary indicator of account opening fraud, wire fraud, or money laundering. Most new accounts with immediate large wires are fraudulent or compromise-related.",
+          "penalty_exposure": "$25,000-$100,000+ for failing to prevent fraud or file SAR. Bank liability for fraud loss.",
+          "remediation_action": "Block or freeze the wire for manual review. Contact customer with detailed verification of wire purpose and beneficiary. Require additional documentation (invoices, contracts). Consider account closure if customer cannot provide satisfactory documentation.",
+          "rows_affected_count": 1,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_velocity_breach",
+        "diagnosis": {
+          "plain_english_explanation": "An account processed more than 10 transactions within a 60-minute window. This velocity is extremely suspicious and inconsistent with normal customer behavior, indicating potential account compromise or fraud.",
+          "regulation_citation": "FinCEN guidance on transaction velocity monitoring. BSA \u00a75318 requiring transaction monitoring and suspicious activity detection.",
+          "severity_classification": "HIGH",
+          "business_risk_summary": "Likely account compromise or automated fraud attack. Immediate action required to prevent further unauthorized transactions.",
+          "penalty_exposure": "$25,000-$50,000 for failure to prevent and detect velocity-based fraud.",
+          "remediation_action": "Immediately freeze account pending customer verification. Contact customer to confirm they authorized all transactions. Reset passwords and review account security. File SAR if suspicious activity confirmed. Consider temporary account closure.",
+          "rows_affected_count": 2,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_counterparty_concentration",
+        "diagnosis": {
+          "plain_english_explanation": "A single counterparty accounts for more than 60% of an account's total outbound transaction volume within a 7-day window. This concentration pattern suggests potential layering, circular fund movement, or business email compromise.",
+          "regulation_citation": "FinCEN guidance on money laundering red flags. AML best practices requiring monitoring of transaction patterns and fund flow concentration.",
+          "severity_classification": "MEDIUM",
+          "business_risk_summary": "Potential money laundering (layering phase), BEC (Business Email Compromise) fraud, or embezzlement. Unusual concentration requires investigation.",
+          "penalty_exposure": "$10,000-$50,000 for failure to detect and file SAR on suspicious concentration patterns.",
+          "remediation_action": "Review transaction purpose and business justification. Verify counterparty identity and relationship with customer. If concentration cannot be explained, file SAR. Implement concentration monitoring rules (alert at 50% threshold).",
+          "rows_affected_count": 13,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_geographic_mismatch",
+        "diagnosis": {
+          "plain_english_explanation": "A transaction originated from a country code that does not match the customer's country of residence, and the customer has NOT declared international travel. This indicates potential account takeover or unauthorized access from another country.",
+          "regulation_citation": "FinCEN guidance on geographic risk. BSA \u00a75318 requiring identification, verification, and monitoring of customer transactions.",
+          "severity_classification": "MEDIUM",
+          "business_risk_summary": "Strong indicator of account compromise or unauthorized access. Potential fraud, identity theft, or unauthorized wire fraud.",
+          "penalty_exposure": "$5,000-$25,000 for failure to detect and report suspicious geographic activity.",
+          "remediation_action": "Contact customer immediately to verify transaction authenticity and their location. If customer did not authorize transaction or travel, treat as account compromise. Change password, enable 2FA, review account for unauthorized access. File fraud report with law enforcement if confirmed unauthorized.",
+          "rows_affected_count": 2,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      },
+      {
+        "rule_id": "transactions_round_amount_concentration",
+        "diagnosis": {
+          "plain_english_explanation": "More than 40% of an account's daily transactions are for exact multiples of $1,000 (e.g., $1,000, $2,000, $5,000). Round amount concentration is a known structuring and money laundering indicator \u2014 legitimate transactions typically vary in amount.",
+          "regulation_citation": "FinCEN guidance on structuring and SAR filing indicators. BSA \u00a75318 monitoring for suspicious patterns.",
+          "severity_classification": "MEDIUM",
+          "business_risk_summary": "Indicates potential structuring, layering, or deliberate pattern-based fund movement to evade detection.",
+          "penalty_exposure": "$5,000-$25,000 for failure to identify and report suspicious round-amount concentration.",
+          "remediation_action": "Review transaction details and business justification for round amounts. Interview customer about transaction patterns. If structuring suspected, file SAR. Implement pattern-based monitoring for round-amount concentration.",
+          "rows_affected_count": 18,
+          "llm_confidence": 0.92,
+          "llm_model": "claude-haiku-4-5-20251001"
+        }
+      }
+    ],
+    "HIGH": [],
+    "MEDIUM": []
+  },
+  "executive_summary": {
+    "total_violations": 11,
+    "critical_violations": 11,
+    "high_violations": 0,
+    "medium_violations": 0,
+    "highest_risk_areas": [
+      "Sanctions Screening (OFAC) \u2014 2 counterparties and transactions match SDN list",
+      "CTR Filing \u2014 8 transactions \u2265$10,000 lack required compliance filings",
+      "Structuring Detection \u2014 4 accounts show suspicious structuring patterns",
+      "PEP Compliance \u2014 1 high-value PEP transaction lacks SAR filing"
+    ],
+    "immediate_actions_required": [
+      {
+        "priority": "URGENT (0-24 hours)",
+        "action": "Freeze all OFAC-flagged counterparty accounts and block related transactions",
+        "responsible_party": "Compliance Officer",
+        "regulatory_deadline": "OFAC notification required within 10 business days",
+        "estimated_impact": "Prevents potential $1M+ penalties and criminal prosecution"
+      },
+      {
+        "priority": "URGENT (0-48 hours)",
+        "action": "File Currency Transaction Reports (CTR) for all 8 unfiled large transactions \u2265$10,000",
+        "responsible_party": "BSA Officer",
+        "regulatory_deadline": "Daily filing requirement; 30-day cure period if already overdue",
+        "estimated_impact": "Each unfiled CTR incurs $25,000/day penalty"
+      },
+      {
+        "priority": "HIGH (1-7 days)",
+        "action": "File Suspicious Activity Reports (SAR) for all 4 structuring transactions and 1 PEP transaction",
+        "responsible_party": "Compliance Officer",
+        "regulatory_deadline": "30 days from detection; document investigation within SAR",
+        "estimated_impact": "Prevents structuring prosecution (5 years prison + $250K fine per violation)"
+      },
+      {
+        "priority": "HIGH (1-7 days)",
+        "action": "Conduct enhanced due diligence on dormant reactivation and new account wire transactions",
+        "responsible_party": "Risk Management",
+        "regulatory_deadline": "Ongoing monitoring requirement",
+        "estimated_impact": "Prevents fraud losses and reduces bank's AML regulatory risk rating"
+      },
+      {
+        "priority": "MEDIUM (1-30 days)",
+        "action": "Implement automated transaction monitoring and alert system for velocity, concentration, and round amounts",
+        "responsible_party": "Compliance Officer + IT",
+        "regulatory_deadline": "Ongoing requirement under BSA \u00a75318",
+        "estimated_impact": "Proactive detection reduces future violations by 80%+"
+      }
+    ],
+    "regulatory_risk_assessment": {
+      "estimated_penalty_exposure": "$500,000 - $3,000,000",
+      "critical_risk_factors": [
+        "Active OFAC violations (most severe)",
+        "Missing CTR filings (high frequency)",
+        "Potential structuring (criminal exposure)",
+        "Weak transaction monitoring controls"
+      ],
+      "likelihood_of_examination": "HIGH \u2014 Bank is overdue for comprehensive AML examination",
+      "remediation_timeline": "30-90 days for immediate controls; 90-180 days for full program enhancement"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+rules:
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_no_null_order_id
+      severity: critical
+      domain: retail
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: not_null
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_positive_revenue
+      severity: high
+      domain: retail
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: sql_expression
+      expression: "revenue >= 0"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: orders_row_count
+      severity: medium
+      domain: retail
+    scope:
+      warehouse: duckdb
+      table: orders
+    logic:
+      type: row_count
+      threshold: 1000

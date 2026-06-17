@@ -1,0 +1,142 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Aegis Rules",
+  "scopeName": "source.aegis-rules",
+  "fileTypes": [".aegis.yaml", ".aegis.yml"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#document_start" },
+    { "include": "#aegis_keys" },
+    { "include": "#severity_values" },
+    { "include": "#rule_type_values" },
+    { "include": "#warehouse_values" },
+    { "include": "#api_version" },
+    { "include": "#kind_value" },
+    { "include": "#sql_block" },
+    { "include": "#yaml_string" },
+    { "include": "#yaml_number" },
+    { "include": "#yaml_bool" },
+    { "include": "#yaml_null" },
+    { "include": "#yaml_list_item" }
+  ],
+  "repository": {
+    "comments": {
+      "match": "#.*$",
+      "name": "comment.line.number-sign.yaml"
+    },
+    "document_start": {
+      "match": "^---",
+      "name": "punctuation.definition.document.yaml"
+    },
+    "aegis_keys": {
+      "patterns": [
+        {
+          "match": "^(rules|metadata|scope|logic|reconciliation|diagnosis|remediation|sla)\\s*:",
+          "captures": {
+            "1": { "name": "keyword.other.aegis.section" }
+          }
+        },
+        {
+          "match": "^\\s+(apiVersion|kind)\\s*:",
+          "captures": {
+            "1": { "name": "keyword.other.aegis.top-level" }
+          }
+        },
+        {
+          "match": "^\\s+(id|severity|domain|owner|tags|description)\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.aegis.metadata" }
+          }
+        },
+        {
+          "match": "^\\s+(warehouse|database|schema|table|columns)\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.aegis.scope" }
+          }
+        },
+        {
+          "match": "^\\s+(type|expression|query|threshold|unit|min_value|max_value|pattern|values|reference_table|reference_column|condition|column_b|source_table|tolerance_pct)\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.aegis.logic" }
+          }
+        },
+        {
+          "match": "^\\s+(common_causes|lineage_hints)\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.aegis.diagnosis" }
+          }
+        },
+        {
+          "match": "^\\s+(auto_remediate|proposal_strategy)\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.aegis.remediation" }
+          }
+        },
+        {
+          "match": "^\\s+(detection_window|notification_target)\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.aegis.sla" }
+          }
+        }
+      ]
+    },
+    "severity_values": {
+      "match": "(?<=severity:\\s)(critical|high|medium|low|info)",
+      "name": "constant.language.aegis.severity"
+    },
+    "rule_type_values": {
+      "match": "(?<=type:\\s)(not_null|not_empty_string|null_percentage_below|unique|composite_unique|duplicate_percentage_below|sql_expression|between|min_value_check|max_value_check|regex_match|accepted_values|not_accepted_values|no_future_dates|column_exists|foreign_key|conditional_not_null|mean_between|stddev_below|column_sum_between|freshness|date_order|row_count|row_count_between|custom_sql|row_count_match|column_sum_match|set_inclusion|set_equality|reconcile_row_count|reconcile_column_sum|reconcile_key_match)",
+      "name": "support.type.aegis.rule-type"
+    },
+    "warehouse_values": {
+      "match": "(?<=warehouse:\\s)(duckdb|bigquery|databricks|athena|snowflake|postgres|redshift)",
+      "name": "support.constant.aegis.warehouse"
+    },
+    "api_version": {
+      "match": "(?<=apiVersion:\\s)(aegis\\.dev/v\\d+)",
+      "name": "constant.language.aegis.api-version"
+    },
+    "kind_value": {
+      "match": "(?<=kind:\\s)(DataQualityRule)",
+      "name": "entity.name.type.aegis.kind"
+    },
+    "sql_block": {
+      "comment": "Embed SQL syntax inside expression: and query: values",
+      "begin": "(expression|query):\\s*[|>]",
+      "end": "^(?=\\S)",
+      "beginCaptures": {
+        "1": { "name": "variable.other.aegis.logic" }
+      },
+      "contentName": "meta.embedded.block.sql",
+      "patterns": [{ "include": "source.sql" }]
+    },
+    "yaml_string": {
+      "patterns": [
+        {
+          "match": "\"[^\"]*\"",
+          "name": "string.quoted.double.yaml"
+        },
+        {
+          "match": "'[^']*'",
+          "name": "string.quoted.single.yaml"
+        }
+      ]
+    },
+    "yaml_number": {
+      "match": "(?<=:\\s)(-?\\d+\\.?\\d*)",
+      "name": "constant.numeric.yaml"
+    },
+    "yaml_bool": {
+      "match": "(?<=:\\s)(true|false|yes|no|on|off)\\b",
+      "name": "constant.language.boolean.yaml"
+    },
+    "yaml_null": {
+      "match": "(?<=:\\s)(null|~)\\b",
+      "name": "constant.language.null.yaml"
+    },
+    "yaml_list_item": {
+      "match": "^\\s*-\\s",
+      "name": "punctuation.definition.list.yaml"
+    }
+  }
+}

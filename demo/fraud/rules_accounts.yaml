@@ -1,0 +1,131 @@
+rules:
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_account_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - account_id
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_customer_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - customer_id
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - checking
+    - savings
+    - wire
+    - investment
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_account_type_valid_values
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - account_type
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - active
+    - frozen
+    - dormant
+    - closed
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_status_valid_values
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - status
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    expression: opened_date <= last_activity_date
+    type: sql_expression
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_opened_date_before_last_activity
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: 'SELECT a.account_id, a.customer_id, a.country_code, c.country_of_residence,
+      a.international_travel_flag
+
+      FROM accounts a
+
+      JOIN customers c ON a.customer_id = c.customer_id
+
+      WHERE a.country_code != c.country_of_residence AND a.international_travel_flag
+      = FALSE
+
+      '
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_geographic_mismatch_without_travel_flag
+    severity: medium
+    status: draft
+    version: 1.0.0
+  scope:
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_opened_date_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - opened_date
+    table: accounts
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: accounts_last_activity_date_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - last_activity_date
+    table: accounts

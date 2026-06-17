@@ -1,0 +1,25 @@
+name: fraud-aml
+description: AML/fraud detection pipeline for FinCore Bank — 12 BSA/OFAC policies across 6 tables
+
+database: /tmp/fraud.duckdb
+rules: rules.yaml
+
+llm:
+  provider: anthropic
+  model: claude-haiku-4-5-20251001
+
+kb:
+  - policy.md
+  - schema.md
+
+output_json: report.json
+
+goal: |
+  Run all AML and fraud detection rules against the FinCore Bank database.
+  For every failure:
+    - Explain what the violation means in plain English
+    - State which regulation or policy it violates (CTR/BSA, OFAC, SAR/FinCEN, structuring 31 USC 5324, etc.)
+    - Quantify the business risk and regulatory penalty exposure
+    - Propose a concrete remediation action
+  Group findings by severity: CRITICAL → HIGH → MEDIUM.
+  End with an executive summary: total violations, highest-risk accounts, and immediate actions required.

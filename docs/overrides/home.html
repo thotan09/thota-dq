@@ -1,0 +1,313 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+{{ super() }}
+
+<style>
+  .md-header { position: initial }
+  .md-main__inner { margin: 0 }
+  .md-content { display: none }
+  @media screen and (min-width: 60em) { .md-sidebar--secondary { display: none } }
+  @media screen and (min-width: 76.25em) { .md-sidebar--primary { display: none } }
+</style>
+
+<!-- ─── HERO ─────────────────────────────────────────────────────────────── -->
+<section class="hp-hero">
+  <div class="hp-container">
+    <div class="hp-hero__badge">v0.7.0 · Apache 2.0 · New: Pipeline Manifests + Hermes MCP</div>
+    <h1 class="hp-hero__title">
+      Business docs in.<br><em>Root causes out.</em>
+    </h1>
+    <p class="hp-hero__sub">
+      Point Aegis at your business docs — policies, schema definitions, SLAs,
+      anything that describes your data. It generates executable rules, runs
+      them across any warehouse, and diagnoses every failure with LLM-powered
+      root cause analysis — automatically.
+    </p>
+    <div class="hp-hero__ctas">
+      <a href="{{ 'getting-started/' | url }}" class="hp-btn hp-btn--primary">Get started →</a>
+      <a href="{{ 'integrations/hermes/' | url }}" class="hp-btn hp-btn--secondary">Hermes integration</a>
+      <a href="https://github.com/aegis-dq/aegis-dq" class="hp-btn hp-btn--ghost" target="_blank">GitHub</a>
+    </div>
+    <div class="hp-hero__install">
+      <code>pip install aegis-dq</code>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─── HOW IT WORKS ──────────────────────────────────────────────────────── -->
+<section class="hp-section hp-section--arch">
+  <div class="hp-container">
+    <h2 class="hp-section__title">How it works</h2>
+    <p class="hp-section__sub">From business docs to diagnosed failures in minutes.</p>
+
+    <div class="hp-steps">
+
+      <div class="hp-step">
+        <div class="hp-step__num">01</div>
+        <div class="hp-step__body">
+          <div class="hp-step__title">Point Aegis at your docs and warehouse</div>
+          <div class="hp-step__desc">
+            Give it your business docs — policies, schema definitions, SLAs,
+            anything that describes your data. Aegis reads the context and
+            generates data quality rules automatically. No hand-writing rules.
+          </div>
+          <div class="hp-step__cmd">aegis generate orders --kb policy.md --kb schema.md</div>
+        </div>
+      </div>
+
+      <div class="hp-step__divider">↓</div>
+
+      <div class="hp-step">
+        <div class="hp-step__num">02</div>
+        <div class="hp-step__body">
+          <div class="hp-step__title">Run checks across any warehouse</div>
+          <div class="hp-step__desc">
+            Aegis executes the rules against your warehouse. Every failure is
+            classified by severity and diagnosed by an LLM — what broke,
+            why it broke, and what regulation or SLA it violates.
+          </div>
+          <div class="hp-step__chips">
+            <span>DuckDB</span><span>BigQuery</span><span>Athena</span>
+            <span>Databricks</span><span>Postgres</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hp-step__divider">↓</div>
+
+      <div class="hp-step">
+        <div class="hp-step__num">03</div>
+        <div class="hp-step__body">
+          <div class="hp-step__title">Get root cause and a fix for every failure</div>
+          <div class="hp-step__desc">
+            Every failing rule comes back with a plain-English diagnosis,
+            root cause, severity tier, and remediation SQL — ready to act on.
+            Every LLM decision is logged with cost and latency.
+          </div>
+          <div class="hp-step__outputs">
+            <span>Root cause</span>
+            <span>Severity</span>
+            <span>Remediation SQL</span>
+            <span>Full audit trail</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Hermes callout -->
+    <div class="hp-hermes-band">
+      <div class="hp-hermes-band__left">
+        <div class="hp-hermes-band__eyebrow">✦ Prefer plain English?</div>
+        <div class="hp-hermes-band__title">Connect Hermes and just ask.</div>
+        <div class="hp-hermes-band__desc">
+          Hermes connects to Aegis via MCP. Load a pipeline manifest and ask in
+          plain English — Hermes runs the checks, diagnoses failures, remembers
+          past runs, and can schedule recurring validations.
+        </div>
+        <a href="{{ 'integrations/hermes/' | url }}" class="hp-btn hp-btn--secondary">Set up Hermes →</a>
+      </div>
+      <div class="hp-hermes-band__right">
+        <div class="hp-hermes-band__bubble hp-hermes-band__bubble--user">
+          Load the pipeline at demo/fraud/pipeline.yaml and run it.
+        </div>
+        <div class="hp-hermes-band__bubble hp-hermes-band__bubble--aegis">
+          <div>✓ Loaded fraud-aml · 6 tables · 55 rules</div>
+          <div>✓ Validated against /tmp/fraud.duckdb</div>
+          <div class="hp-hermes-band__alert">⚠ 11 violations — 5 CRITICAL (CTR, OFAC, PEP)</div>
+          <div>→ Remediation SQL ready · Total cost: $0.01</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── THREE CAPABILITIES ───────────────────────────────────────────────── -->
+<section class="hp-section hp-section--alt">
+  <div class="hp-container">
+    <h2 class="hp-section__title">Three ways to use Aegis</h2>
+    <div class="hp-caps">
+
+      <div class="hp-cap">
+        <div class="hp-cap__verb hp-cap__verb--generate">Generate</div>
+        <div class="hp-cap__title">Rules from business docs</div>
+        <div class="hp-cap__desc">
+          Point Aegis at your business docs and schema.
+          It introspects the database, reads the context, and writes
+          <code>not_null</code>, <code>accepted_values</code>, and
+          complex <code>custom_sql</code> rules — including CTEs,
+          window functions, and multi-table JOINs.
+        </div>
+        <div class="hp-cap__cmd">aegis generate transactions --kb policy.md --kb schema.md</div>
+      </div>
+
+      <div class="hp-cap">
+        <div class="hp-cap__verb hp-cap__verb--run">Run</div>
+        <div class="hp-cap__title">Pipeline manifests</div>
+        <div class="hp-cap__desc">
+          A <code>pipeline.yaml</code> captures your database, rules,
+          docs, LLM config, and goal in one file.
+          Define it once. Run it from the CLI, Airflow, GitHub Actions,
+          or any MCP client — same config everywhere.
+        </div>
+        <div class="hp-cap__cmd">aegis pipeline run my-project/pipeline.yaml</div>
+      </div>
+
+      <div class="hp-cap">
+        <div class="hp-cap__verb hp-cap__verb--talk">Talk</div>
+        <div class="hp-cap__title">Conversational via Hermes</div>
+        <div class="hp-cap__desc">
+          Connect Hermes via MCP. Ask it to load your pipeline, run
+          validation, and diagnose failures in plain English. Hermes
+          remembers past runs, can schedule recurring checks, and
+          delivers results wherever you work.
+        </div>
+        <div class="hp-cap__cmd">Load the pipeline at demo/fraud/pipeline.yaml and run it.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── REAL-WORLD DEMO ───────────────────────────────────────────────────── -->
+<section class="hp-section">
+  <div class="hp-container hp-container--narrow">
+    <h2 class="hp-section__title">Tested on real-world AML / fraud detection</h2>
+    <p class="hp-section__sub">
+      12 BSA/OFAC policies · 6 database tables · fully generated rule set
+    </p>
+
+    <div class="hp-demo">
+      <div class="hp-demo__stat">
+        <div class="hp-demo__val">12</div>
+        <div class="hp-demo__label">policies in<br><code>policy.md</code></div>
+      </div>
+      <div class="hp-demo__arrow">→</div>
+      <div class="hp-demo__stat">
+        <div class="hp-demo__val">55</div>
+        <div class="hp-demo__label">rules generated<br>across 6 tables</div>
+      </div>
+      <div class="hp-demo__arrow">→</div>
+      <div class="hp-demo__stat">
+        <div class="hp-demo__val">11</div>
+        <div class="hp-demo__label">violations detected<br>CTR · OFAC · SAR · structuring</div>
+      </div>
+      <div class="hp-demo__arrow">→</div>
+      <div class="hp-demo__stat hp-demo__stat--highlight">
+        <div class="hp-demo__val">$0.01</div>
+        <div class="hp-demo__label">total cost<br>Claude Haiku</div>
+      </div>
+    </div>
+
+    <div class="hp-demo__regs">
+      <span>31 U.S.C. § 5313 — CTR filing</span>
+      <span>31 U.S.C. § 5324 — Structuring</span>
+      <span>OFAC SDN — 31 C.F.R. 500-598</span>
+      <span>FinCEN FIN-2012-G003 — PEP oversight</span>
+    </div>
+
+    <div class="hp-demo__cta">
+      <a href="{{ 'integrations/hermes/' | url }}#real-world-demo-aml--fraud-detection" class="hp-btn hp-btn--ghost">
+        See the full walkthrough →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── START HERE CARDS ──────────────────────────────────────────────────── -->
+<section class="hp-section hp-section--alt">
+  <div class="hp-container">
+    <h2 class="hp-section__title">Start here</h2>
+    <div class="hp-cards">
+      <a href="{{ 'getting-started/' | url }}" class="hp-card">
+        <div class="hp-card__icon">🚀</div>
+        <div class="hp-card__title">Quickstart</div>
+        <div class="hp-card__desc">Zero to a passing pipeline in 5 minutes.</div>
+      </a>
+      <a href="{{ 'integrations/hermes/' | url }}" class="hp-card hp-card--featured">
+        <div class="hp-card__icon">🤖</div>
+        <div class="hp-card__title">Hermes Integration <span class="hp-card__new">NEW</span></div>
+        <div class="hp-card__desc">Pipeline manifests, MCP tools, and conversational DQ with one prompt.</div>
+      </a>
+      <a href="{{ 'rule-schema-reference/' | url }}" class="hp-card">
+        <div class="hp-card__icon">📐</div>
+        <div class="hp-card__title">Rule Schema</div>
+        <div class="hp-card__desc">All 31 rule types — from <code>not_null</code> to <code>custom_sql</code> with CTEs.</div>
+      </a>
+      <a href="{{ 'integrations/mcp/' | url }}" class="hp-card">
+        <div class="hp-card__icon">🔌</div>
+        <div class="hp-card__title">MCP Server</div>
+        <div class="hp-card__desc">9 tools — <code>load_pipeline</code>, <code>run_validation</code>, <code>compare_reports</code>, audit trail search.</div>
+      </a>
+      <a href="{{ 'architecture/' | url }}" class="hp-card">
+        <div class="hp-card__icon">🏗</div>
+        <div class="hp-card__title">Architecture</div>
+        <div class="hp-card__desc">The 5-node LangGraph pipeline — plan, execute, reconcile, remediate, report.</div>
+      </a>
+      <a href="{{ 'vs-competitors/' | url }}" class="hp-card">
+        <div class="hp-card__icon">🆚</div>
+        <div class="hp-card__title">vs GE · Soda · Monte Carlo</div>
+        <div class="hp-card__desc">They tell you a rule failed. Aegis tells you why and how to fix it.</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WORKS WITH YOUR STACK ─────────────────────────────────────────────── -->
+<section class="hp-section">
+  <div class="hp-container hp-container--narrow">
+    <h2 class="hp-section__title">Works with your stack</h2>
+    <div class="hp-adapters">
+      <div class="hp-adapter-row">
+        <span class="hp-adapter-label">Warehouses</span>
+        <div class="hp-adapter-chips">
+          <span>DuckDB</span><span>Postgres</span><span>Redshift</span>
+          <span>BigQuery</span><span>Databricks</span><span>Athena</span>
+        </div>
+      </div>
+      <div class="hp-adapter-row">
+        <span class="hp-adapter-label">LLM providers</span>
+        <div class="hp-adapter-chips">
+          <span>Anthropic Claude</span><span>OpenAI</span>
+          <span>AWS Bedrock</span><span>Ollama · local · $0</span>
+        </div>
+      </div>
+      <div class="hp-adapter-row">
+        <span class="hp-adapter-label">Integrations</span>
+        <div class="hp-adapter-chips">
+          <span>Hermes</span><span>Claude Desktop</span><span>Cursor</span>
+          <span>dbt</span><span>Airflow</span><span>GitHub Actions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COST STRIP ────────────────────────────────────────────────────────── -->
+<section class="hp-section hp-section--alt">
+  <div class="hp-container hp-container--narrow">
+    <div class="hp-cost-strip">
+      <div class="hp-cost-item">
+        <div class="hp-cost-item__value">$0</div>
+        <div class="hp-cost-item__label"><code>--no-llm</code> mode<br>rules only, no LLM</div>
+      </div>
+      <div class="hp-cost-divider"></div>
+      <div class="hp-cost-item">
+        <div class="hp-cost-item__value">$0</div>
+        <div class="hp-cost-item__label">Ollama<br>fully offline, any model</div>
+      </div>
+      <div class="hp-cost-divider"></div>
+      <div class="hp-cost-item hp-cost-item--highlight">
+        <div class="hp-cost-item__value">$0.01</div>
+        <div class="hp-cost-item__label">55 rules · 11 AML violations<br>diagnosed · Claude Haiku</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{{ super() }}{% endblock %}

@@ -1,0 +1,123 @@
+rules:
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_flag_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - flag_id
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_account_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - account_id
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - CTR
+    - SAR
+    - OFAC_HIT
+    - STRUCTURING
+    - MANUAL_REVIEW
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_flag_type_valid_values
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - flag_type
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - filed
+    - overdue
+    - waived
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_status_valid_values
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - status
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_filed_at_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - filed_at
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    expression: due_at IS NULL OR due_at >= filed_at
+    type: sql_expression
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_due_at_after_filed_at
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "SELECT cf.flag_id, cf.txn_id, cf.account_id\nFROM compliance_flags cf\n\
+      WHERE cf.txn_id IS NOT NULL\nAND NOT EXISTS (\n  SELECT 1 FROM transactions\
+      \ t WHERE t.txn_id = cf.txn_id\n)\n"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_txn_id_referential_integrity
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: compliance_flags
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: "SELECT cf.flag_id, cf.account_id\nFROM compliance_flags cf\nWHERE NOT\
+      \ EXISTS (\n  SELECT 1 FROM accounts a WHERE a.account_id = cf.account_id\n)"
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: compliance_flags_account_id_referential_integrity
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: compliance_flags

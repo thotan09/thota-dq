@@ -1,0 +1,121 @@
+rules:
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_customer_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - customer_id
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: unique
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_customer_id_unique
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - customer_id
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - verified
+    - pending
+    - failed
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_kyc_status_valid_values
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - kyc_status
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - low
+    - medium
+    - high
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_risk_tier_valid_values
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - risk_tier
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_full_name_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - full_name
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_dob_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - dob
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    expression: (kyc_status = 'verified' AND kyc_verified_at IS NOT NULL) OR (kyc_status
+      IN ('pending', 'failed') AND kyc_verified_at IS NULL)
+    type: sql_expression
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_kyc_verified_at_consistency
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    table: customers
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: customers_pep_flag_not_null
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - pep_flag
+    table: customers

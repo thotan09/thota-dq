@@ -1,0 +1,561 @@
+# Aegis Retail Industry Pack v0.1
+# 25 pre-built rules for e-commerce data quality
+# Tables: orders, order_items, products, customers
+#
+# Usage:
+#   thota-dq run retail_rules.yaml --db your_warehouse.db
+#   thota-dq validate retail_rules.yaml
+#
+# Customise table names via find-and-replace, or use:
+#   thota-dq rules pack retail --orders-table my_orders_table
+
+rules:
+
+  # ── orders table (10 rules) ──────────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_no_null_order_id
+      severity: critical
+      domain: retail
+      tags: [retail, orders, completeness]
+      description: "Every order must have an order_id"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "ETL pipeline failed to populate order_id"
+        - "Mobile API orders missing ID generation"
+        - "Batch import skipped ID assignment step"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_unique_order_id
+      severity: critical
+      domain: retail
+      tags: [retail, orders, uniqueness]
+      description: "order_id must be unique — no duplicate orders"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: unique
+    diagnosis:
+      common_causes:
+        - "Retry logic in checkout service creating duplicate records"
+        - "Merge/upsert statement missing deduplication key"
+        - "Multiple payment gateway callbacks each inserting a row"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_valid_status
+      severity: high
+      domain: retail
+      tags: [retail, orders, validity]
+      description: "Order status must be one of the accepted lifecycle values"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [status]
+    logic:
+      type: accepted_values
+      values:
+        - placed
+        - confirmed
+        - shipped
+        - delivered
+        - cancelled
+        - refunded
+    diagnosis:
+      common_causes:
+        - "Third-party OMS uses different status codes (e.g. PROCESSING)"
+        - "Typo in status enum during a schema migration"
+        - "Legacy orders imported with old status vocabulary"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_non_negative_revenue
+      severity: critical
+      domain: retail
+      tags: [retail, orders, validity, revenue]
+      description: "Revenue must not be negative"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [revenue]
+    logic:
+      type: sql_expression
+      expression: "revenue >= 0"
+    diagnosis:
+      common_causes:
+        - "Refund transactions incorrectly written as negative revenue rows"
+        - "Currency conversion applied twice with wrong sign"
+        - "Test data with negative sentinel values leaked into production"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_revenue_range
+      severity: high
+      domain: retail
+      tags: [retail, orders, validity, revenue]
+      description: "Revenue must be between 0 and 1,000,000 (catch extreme outliers)"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [revenue]
+    logic:
+      type: between
+      min_value: 0
+      max_value: 1000000
+    diagnosis:
+      common_causes:
+        - "Unit price stored in minor currency units (cents) instead of dollars"
+        - "Quantity multiplied into revenue field instead of stored separately"
+        - "Bulk/enterprise order missing price-cap logic"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_no_null_customer_id
+      severity: high
+      domain: retail
+      tags: [retail, orders, completeness]
+      description: "Every order must be linked to a customer"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [customer_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Guest checkout flow not assigning a customer_id"
+        - "Foreign key not enforced in warehouse layer"
+        - "Customer record deleted without cascading update to orders"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_no_null_created_at
+      severity: medium
+      domain: retail
+      tags: [retail, orders, completeness, timeliness]
+      description: "Every order must have a creation timestamp"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [created_at]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "DB trigger that sets created_at was disabled during a migration"
+        - "Bulk import did not include a created_at column"
+        - "Application defaulting to NULL instead of NOW()"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_no_future_created_at
+      severity: medium
+      domain: retail
+      tags: [retail, orders, timeliness]
+      description: "Order creation timestamps must not be in the future"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [created_at]
+    logic:
+      type: no_future_dates
+    diagnosis:
+      common_causes:
+        - "Server clock skew on a checkout service node"
+        - "Scheduled pre-orders written with the intended delivery date"
+        - "Timezone conversion bug adding 24 hours to timestamps"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_freshness_24h
+      severity: high
+      domain: retail
+      tags: [retail, orders, timeliness, freshness]
+      description: "Orders table must be updated at least once every 24 hours"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [created_at]
+    logic:
+      type: freshness
+      threshold: 24
+      unit: hours
+    diagnosis:
+      common_causes:
+        - "Nightly ELT pipeline failed silently"
+        - "Source database connection timeout caused load to abort"
+        - "Incremental model misconfigured — no new rows detected"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_min_row_count
+      severity: medium
+      domain: retail
+      tags: [retail, orders, volume]
+      description: "Orders table must not be empty — catches accidental truncations"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: []
+    logic:
+      type: row_count_between
+      min_value: 1
+    diagnosis:
+      common_causes:
+        - "Accidental TRUNCATE TABLE run in production"
+        - "Pipeline DELETE statement with missing WHERE clause"
+        - "Staging-to-production swap loaded an empty staging table"
+
+  # ── order_items table (5 rules) ──────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_order_items_no_null_order_id
+      severity: critical
+      domain: retail
+      tags: [retail, order_items, completeness, referential]
+      description: "Every order line item must reference a parent order_id"
+    scope:
+      warehouse: duckdb
+      table: order_items
+      columns: [order_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Cart service writing items before order header is committed"
+        - "Partial insert failure leaving orphaned line items"
+        - "Bulk import of items without matching order records"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_order_items_no_null_product_id
+      severity: critical
+      domain: retail
+      tags: [retail, order_items, completeness]
+      description: "Every order line item must reference a product"
+    scope:
+      warehouse: duckdb
+      table: order_items
+      columns: [product_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Product was deleted from catalog while order was in-flight"
+        - "Custom/bespoke item entered without a catalog product_id"
+        - "Import mapping failed to resolve product SKU to product_id"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_order_items_positive_quantity
+      severity: high
+      domain: retail
+      tags: [retail, order_items, validity]
+      description: "Quantity ordered must be at least 1"
+    scope:
+      warehouse: duckdb
+      table: order_items
+      columns: [quantity]
+    logic:
+      type: min_value_check
+      min_value: 1
+    diagnosis:
+      common_causes:
+        - "Cancelled line items recorded as quantity=0 instead of being removed"
+        - "UI allows quantity decrement below 1 before checkout validation fires"
+        - "Bulk update accidentally set quantity to 0 for a product category"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_order_items_quantity_expression
+      severity: high
+      domain: retail
+      tags: [retail, order_items, validity]
+      description: "Quantity must be strictly greater than zero (SQL expression check)"
+    scope:
+      warehouse: duckdb
+      table: order_items
+      columns: [quantity]
+    logic:
+      type: sql_expression
+      expression: "quantity > 0"
+    diagnosis:
+      common_causes:
+        - "Return/refund items recorded as negative or zero quantity"
+        - "Data type coercion producing implicit zero for NULL quantity"
+        - "Race condition between cart update and order finalisation"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_order_items_non_negative_unit_price
+      severity: high
+      domain: retail
+      tags: [retail, order_items, validity]
+      description: "Unit price per line item must be non-negative"
+    scope:
+      warehouse: duckdb
+      table: order_items
+      columns: [unit_price]
+    logic:
+      type: min_value_check
+      min_value: 0.0
+    diagnosis:
+      common_causes:
+        - "Discount applied as negative price instead of a separate discount column"
+        - "Free promotional items stored with price=-1 as a sentinel value"
+        - "Currency conversion overflow producing negative float"
+
+  # ── products table (5 rules) ─────────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_products_no_null_product_id
+      severity: critical
+      domain: retail
+      tags: [retail, products, completeness]
+      description: "Every product must have a product_id"
+    scope:
+      warehouse: duckdb
+      table: products
+      columns: [product_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "PIM system export missing primary key column"
+        - "Partial import from a product feed that omits IDs"
+        - "Auto-increment sequence exhausted and rolled over to NULL"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_products_unique_product_id
+      severity: critical
+      domain: retail
+      tags: [retail, products, uniqueness]
+      description: "product_id must be unique across the catalog"
+    scope:
+      warehouse: duckdb
+      table: products
+      columns: [product_id]
+    logic:
+      type: unique
+    diagnosis:
+      common_causes:
+        - "Multi-source product feed merging without deduplication"
+        - "UPSERT logic failing and inserting a second row"
+        - "Product ID collision between marketplace and owned catalog"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_products_no_null_name
+      severity: high
+      domain: retail
+      tags: [retail, products, completeness]
+      description: "Every product must have a name"
+    scope:
+      warehouse: duckdb
+      table: products
+      columns: [name]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Product feed from supplier missing name field for new SKUs"
+        - "Translation pipeline left name as NULL for unsupported locales"
+        - "Draft products published before content was filled in"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_products_non_empty_name
+      severity: medium
+      domain: retail
+      tags: [retail, products, completeness]
+      description: "Product name must not be an empty or whitespace-only string"
+    scope:
+      warehouse: duckdb
+      table: products
+      columns: [name]
+    logic:
+      type: not_empty_string
+    diagnosis:
+      common_causes:
+        - "CMS export writing empty string instead of NULL for blank fields"
+        - "Placeholder name cleared by content editor without replacement"
+        - "Import script stripping special characters and leaving whitespace"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_products_non_negative_price
+      severity: high
+      domain: retail
+      tags: [retail, products, validity]
+      description: "Product price must be non-negative"
+    scope:
+      warehouse: duckdb
+      table: products
+      columns: [price]
+    logic:
+      type: min_value_check
+      min_value: 0.0
+    diagnosis:
+      common_causes:
+        - "Manual price correction entered with wrong sign"
+        - "Price import from supplier using negative values for 'on request'"
+        - "Discount calculation overwriting base price instead of derived price"
+
+  # ── customers table (5 rules) ────────────────────────────────────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_customers_no_null_customer_id
+      severity: critical
+      domain: retail
+      tags: [retail, customers, completeness]
+      description: "Every customer record must have a customer_id"
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [customer_id]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Identity provider failing to return user ID on registration"
+        - "Batch import of legacy customers missing ID column mapping"
+        - "Anonymous session records written to customers table by mistake"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_customers_unique_customer_id
+      severity: critical
+      domain: retail
+      tags: [retail, customers, uniqueness]
+      description: "customer_id must be unique — no duplicate customer records"
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [customer_id]
+    logic:
+      type: unique
+    diagnosis:
+      common_causes:
+        - "Account merge process creating duplicate rows instead of updating"
+        - "Social login and email login for same user treated as separate customers"
+        - "Data replication replaying INSERT events for already-existing records"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_customers_no_null_email
+      severity: high
+      domain: retail
+      tags: [retail, customers, completeness]
+      description: "Every customer must have an email address"
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [email]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Phone-number-only registration flow skipping email requirement"
+        - "GDPR deletion request zeroing email without removing the row"
+        - "Imported wholesale customers lacking email in source data"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_customers_valid_email_format
+      severity: medium
+      domain: retail
+      tags: [retail, customers, validity]
+      description: "Customer email must match a basic valid email pattern"
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [email]
+    logic:
+      type: regex_match
+      pattern: "^[^@]+@[^@]+\\.[^@]+$"
+    diagnosis:
+      common_causes:
+        - "UI validation bypassed via direct API call"
+        - "Placeholder or test values (e.g. 'noemail', 'N/A') stored in email field"
+        - "Import from CRM with corrupted or truncated email addresses"
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_customers_no_null_created_at
+      severity: low
+      domain: retail
+      tags: [retail, customers, completeness, timeliness]
+      description: "Every customer record should have a creation timestamp"
+    scope:
+      warehouse: duckdb
+      table: customers
+      columns: [created_at]
+    logic:
+      type: not_null
+    diagnosis:
+      common_causes:
+        - "Legacy customer records migrated without a created_at backfill"
+        - "Registration service omitting timestamp on social sign-up path"
+        - "Schema change added created_at column with no default for existing rows"
+
+  # ── orders: null_percentage_below on order_id (bonus rule) ──────────────────
+
+  - apiVersion: aegis.dev/v1
+    kind: DataQualityRule
+    metadata:
+      id: retail_orders_null_pct_order_id
+      severity: critical
+      domain: retail
+      tags: [retail, orders, completeness, percentage]
+      description: "NULL order_id values must be below 0.1% of total rows"
+    scope:
+      warehouse: duckdb
+      table: orders
+      columns: [order_id]
+    logic:
+      type: null_percentage_below
+      threshold: 0.1
+    diagnosis:
+      common_causes:
+        - "Gradual degradation of ID generation service — early warning signal"
+        - "Subset of orders from a specific channel missing order_id"
+        - "Partial ETL failure leaving a fraction of rows without an ID"

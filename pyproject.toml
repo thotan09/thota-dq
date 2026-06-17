@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "thota-dq"
+version = "0.7.0"
+description = "Open, audit-grade agentic data quality framework with portable industry packs"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.11"
+authors = [{name = "Naveen Thota", email = "thotan09@gmail.com"}]
+keywords = ["data quality", "data validation", "llm", "agentic", "langgraph", "duckdb"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+  "langgraph>=0.2",
+  "langchain-anthropic>=0.3",
+  "langchain-core>=0.3",
+  "anthropic>=0.40",
+  "duckdb>=1.0",
+  "pydantic>=2.0",
+  "pydantic-settings>=2.0",
+  "typer>=0.12",
+  "rich>=13.0",
+  "pyyaml>=6.0",
+  "aiofiles>=23.0",
+  "httpx>=0.27",
+  "sqlalchemy>=2.0",
+  "aiosqlite>=0.20",
+  "sqlglot>=20.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/thotan09/thota-dq"
+Repository = "https://github.com/thotan09/thota-dq"
+Documentation = "https://github.com/thotan09/thota-dq"
+"Issue Tracker" = "https://github.com/thotan09/thota-dq/issues"
+Changelog = "https://github.com/thotan09/thota-dq/releases"
+
+[project.optional-dependencies]
+ml = ["scikit-learn>=1.4", "numpy>=1.26"]
+mcp = ["mcp>=1.0"]
+openai = ["openai>=1.30"]
+ollama = []
+snowflake = ["snowflake-connector-python>=3.0"]
+bigquery = ["google-cloud-bigquery>=3.0"]
+airflow = ["apache-airflow>=2.7"]
+databricks = ["databricks-sql-connector>=3.0"]
+athena = ["pyathena>=3.0"]
+postgres = ["psycopg2-binary>=2.9"]
+rest = ["fastapi>=0.110", "uvicorn[standard]>=0.29"]
+docs = ["mkdocs-material>=9.0"]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.4", "mypy>=1.10", "openai>=1.30", "numpy>=1.26", "pandas>=2.0", "scikit-learn>=1.4"]
+
+[project.scripts]
+thota-dq = "thota_dq.cli.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["thota_dq", "aegis_benchmark"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = ["slow: full benchmark harness runs — excluded from CI"]

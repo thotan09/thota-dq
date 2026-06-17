@@ -1,0 +1,274 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://thotan09.github.io/thota-dq/schemas/thota-rule.json",
+  "title": "Aegis DQ Rule File",
+  "description": "Schema for Aegis DQ data quality rule YAML files.",
+  "type": "object",
+  "required": ["rules"],
+  "properties": {
+    "rules": {
+      "type": "array",
+      "description": "List of data quality rules.",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/DataQualityRule" }
+    }
+  },
+  "definitions": {
+    "DataQualityRule": {
+      "type": "object",
+      "required": ["apiVersion", "kind", "metadata", "scope", "logic"],
+      "additionalProperties": false,
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "aegis.dev/v1",
+          "description": "API version. Must be 'aegis.dev/v1'."
+        },
+        "kind": {
+          "type": "string",
+          "const": "DataQualityRule",
+          "description": "Resource kind. Must be 'DataQualityRule'."
+        },
+        "metadata": { "$ref": "#/definitions/RuleMetadata" },
+        "scope": { "$ref": "#/definitions/RuleScope" },
+        "logic": { "$ref": "#/definitions/RuleLogic" },
+        "reconciliation": { "$ref": "#/definitions/ReconciliationConfig" },
+        "diagnosis": { "$ref": "#/definitions/DiagnosisHints" },
+        "remediation": { "$ref": "#/definitions/RemediationConfig" },
+        "sla": { "$ref": "#/definitions/SLAConfig" }
+      }
+    },
+    "RuleMetadata": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique rule identifier (snake_case recommended).",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "default": "medium",
+          "description": "Severity level when this rule fails."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Business domain (e.g. 'finance', 'logistics')."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Team or person responsible for this rule."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Labels for grouping and filtering rules."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what this rule checks."
+        }
+      }
+    },
+    "RuleScope": {
+      "type": "object",
+      "required": ["table"],
+      "additionalProperties": false,
+      "properties": {
+        "warehouse": {
+          "type": "string",
+          "enum": ["duckdb", "bigquery", "databricks", "athena", "snowflake", "postgres", "redshift"],
+          "default": "duckdb",
+          "description": "Warehouse adapter to use."
+        },
+        "database": {
+          "type": "string",
+          "description": "Database name (BigQuery project, Databricks catalog, etc.)."
+        },
+        "schema": {
+          "type": "string",
+          "description": "Schema / dataset name."
+        },
+        "table": {
+          "type": "string",
+          "description": "Table name to validate."
+        },
+        "columns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Column(s) this rule applies to. Empty means table-level."
+        }
+      }
+    },
+    "RuleLogic": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "not_null",
+            "not_empty_string",
+            "null_percentage_below",
+            "unique",
+            "composite_unique",
+            "duplicate_percentage_below",
+            "sql_expression",
+            "between",
+            "min_value_check",
+            "max_value_check",
+            "regex_match",
+            "accepted_values",
+            "not_accepted_values",
+            "no_future_dates",
+            "column_exists",
+            "foreign_key",
+            "conditional_not_null",
+            "mean_between",
+            "stddev_below",
+            "column_sum_between",
+            "freshness",
+            "date_order",
+            "row_count",
+            "row_count_between",
+            "custom_sql",
+            "row_count_match",
+            "column_sum_match",
+            "set_inclusion",
+            "set_equality",
+            "reconcile_row_count",
+            "reconcile_column_sum",
+            "reconcile_key_match"
+          ],
+          "description": "Rule type. Determines which logic and fields apply."
+        },
+        "expression": {
+          "type": "string",
+          "description": "SQL WHERE clause that rows must satisfy to PASS (sql_expression)."
+        },
+        "query": {
+          "type": "string",
+          "description": "Full custom SQL returning (passed BOOLEAN, row_count INT) (custom_sql)."
+        },
+        "threshold": {
+          "type": "number",
+          "description": "Numeric threshold: max allowed NULL %, max hours stale, min row count, etc."
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["hours", "minutes", "days", "rows"],
+          "description": "Unit for threshold (freshness uses 'hours')."
+        },
+        "min_value": {
+          "type": "number",
+          "description": "Lower bound for between / mean_between / column_sum_between / row_count_between."
+        },
+        "max_value": {
+          "type": "number",
+          "description": "Upper bound for between / mean_between / column_sum_between / row_count_between."
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Regular expression pattern for regex_match."
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Allowed or rejected value list for accepted_values / not_accepted_values."
+        },
+        "reference_table": {
+          "type": "string",
+          "description": "Target table for foreign_key check."
+        },
+        "reference_column": {
+          "type": "string",
+          "description": "Target column in reference_table for foreign_key check."
+        },
+        "condition": {
+          "type": "string",
+          "description": "SQL condition that triggers the not-null requirement (conditional_not_null)."
+        },
+        "column_b": {
+          "type": "string",
+          "description": "Second column for date_order (first_col <= column_b)."
+        },
+        "source_table": {
+          "type": "string",
+          "description": "Table to compare against for reconciliation rules."
+        },
+        "tolerance_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0,
+          "description": "Allowed percentage deviation for reconciliation rules."
+        }
+      }
+    },
+    "ReconciliationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_table": { "type": "string" },
+        "source_column": { "type": "string" },
+        "transform": { "type": "string" },
+        "tolerance": { "type": "number", "minimum": 0 }
+      }
+    },
+    "DiagnosisHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "common_causes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Hints passed to the LLM when diagnosing this rule's failures."
+        },
+        "lineage_hints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "description": "Upstream table → column dependencies for RCA lineage context."
+        }
+      }
+    },
+    "RemediationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "auto_remediate": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically apply LLM-proposed fixes (experimental)."
+        },
+        "proposal_strategy": {
+          "type": "string",
+          "enum": ["llm_with_lineage", "llm_simple", "none"],
+          "default": "llm_simple",
+          "description": "How to generate remediation proposals."
+        }
+      }
+    },
+    "SLAConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "detection_window": {
+          "type": "string",
+          "default": "1h",
+          "description": "How quickly a failure must be detected (e.g. '1h', '30m')."
+        },
+        "notification_target": {
+          "type": "string",
+          "description": "Slack webhook URL or email address for SLA breach alerts."
+        }
+      }
+    }
+  }
+}

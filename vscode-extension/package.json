@@ -1,0 +1,108 @@
+{
+  "name": "thota-dq",
+  "displayName": "Aegis DQ",
+  "description": "Syntax highlighting, autocomplete, snippets, and inline validation for Aegis DQ rule YAML files.",
+  "version": "0.1.0",
+  "publisher": "thota-dq",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thota-dq/thota-dq"
+  },
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "keywords": [
+    "data quality",
+    "dbt",
+    "duckdb",
+    "bigquery",
+    "validation",
+    "yaml"
+  ],
+  "activationEvents": [
+    "onLanguage:thota-rules",
+    "onLanguage:yaml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "thota-rules",
+        "aliases": ["Aegis Rules", "thota-rules"],
+        "extensions": [".aegis.yaml", ".aegis.yml"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "thota-rules",
+        "scopeName": "source.thota-rules",
+        "path": "./syntaxes/thota-rules.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.sql": "sql"
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "thota-rules",
+        "path": "./snippets/thota-rules.code-snippets"
+      },
+      {
+        "language": "yaml",
+        "path": "./snippets/thota-rules.code-snippets"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": ["*.aegis.yaml", "*.aegis.yml", "rules.yaml", "rules.yml"],
+        "url": "./schemas/aegis-rule.json"
+      }
+    ],
+    "configuration": {
+      "title": "Aegis DQ",
+      "properties": {
+        "aegisDQ.validateOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run schema validation when a rules file is saved."
+        },
+        "aegisDQ.hoverDocs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show hover documentation for rule types and severity values."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "aegisDQ.validateFile",
+        "title": "Aegis DQ: Validate Rule File"
+      },
+      {
+        "command": "aegisDQ.insertSnippet",
+        "title": "Aegis DQ: Insert Rule Template"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.24.0"
+  }
+}

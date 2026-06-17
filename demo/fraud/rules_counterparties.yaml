@@ -1,0 +1,124 @@
+rules:
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_counterparty_id_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - counterparty_id
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_name_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - name
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_account_number_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - account_number
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_bank_code_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - bank_code
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: not_null
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_country_code_not_null
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - country_code
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: accepted_values
+    values:
+    - individual
+    - business
+    - government
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_entity_type_valid_values
+    severity: high
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - entity_type
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    query: 'SELECT c.counterparty_id, c.name
+
+      FROM counterparties c
+
+      INNER JOIN sanctions_list sl ON c.name = sl.name
+
+      WHERE sl.delisted_at IS NULL
+
+      '
+    type: custom_sql
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_name_ofac_sanctions_check
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    table: counterparties
+- apiVersion: aegis.dev/v1
+  kind: DataQualityRule
+  logic:
+    type: unique
+  metadata:
+    generated_by: claude-haiku-4-5-20251001
+    id: counterparties_counterparty_id_unique
+    severity: critical
+    status: draft
+    version: 1.0.0
+  scope:
+    columns:
+    - counterparty_id
+    table: counterparties

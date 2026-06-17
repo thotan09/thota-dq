@@ -1,0 +1,154 @@
+name: 'Thota DQ'
+description: 'Data quality CI gate — 31 rule types, LLM root-cause diagnosis, and SQL auto-fix · DuckDB · Postgres · BigQuery · Databricks · Snowflake'
+author: 'Naveen Thota'
+
+branding:
+  icon: 'shield'
+  color: 'purple'
+
+inputs:
+  rules-file:
+    description: 'Path to rules YAML file'
+    required: false
+    default: 'rules.yaml'
+  db:
+    description: 'DuckDB file path (or :memory:)'
+    required: false
+    default: ':memory:'
+  warehouse:
+    description: 'Warehouse type: duckdb|postgres|redshift'
+    required: false
+    default: 'duckdb'
+  pg-dsn:
+    description: 'PostgreSQL / Redshift connection DSN'
+    required: false
+    default: ''
+  no-llm:
+    description: 'Skip LLM diagnosis — set to "true" for offline / cost-free mode'
+    required: false
+    default: 'false'
+  llm:
+    description: 'LLM provider: anthropic|openai|ollama'
+    required: false
+    default: 'anthropic'
+  llm-model:
+    description: 'Override the default model for the chosen LLM provider'
+    required: false
+    default: ''
+  fail-on-failure:
+    description: 'Fail the workflow step when any rules fail (set to "false" to report only)'
+    required: false
+    default: 'true'
+  version:
+    description: 'thota-dq version to install (defaults to latest on PyPI)'
+    required: false
+    default: ''
+  anthropic-api-key:
+    description: 'Anthropic API key (required when llm=anthropic)'
+    required: false
+    default: ''
+  openai-api-key:
+    description: 'OpenAI API key (required when llm=openai)'
+    required: false
+    default: ''
+
+outputs:
+  rules-checked:
+    description: 'Total number of rules evaluated'
+    value: ${{ steps.parse.outputs.rules-checked }}
+  passed:
+    description: 'Number of rules that passed'
+    value: ${{ steps.parse.outputs.passed }}
+  failed:
+    description: 'Number of rules that failed'
+    value: ${{ steps.parse.outputs.failed }}
+  pass-rate:
+    description: 'Pass rate as a decimal percentage (e.g. "66.67")'
+    value: ${{ steps.parse.outputs.pass-rate }}
+  report-json:
+    description: 'Absolute path to the full JSON report written by this run'
+    value: ${{ steps.run.outputs.report-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install thota-dq
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.version }}" ]; then
+          pip install --quiet "thota-dq==${{ inputs.version }}"
+        else
+          pip install --quiet thota-dq
+        fi
+
+    - name: Run thota-dq
+      id: run
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+      run: |
+        REPORT_PATH="$(mktemp).json"
+        echo "report-path=$REPORT_PATH" >> "$GITHUB_OUTPUT"
+
+        ARGS="${{ inputs.rules-file }}"
+        ARGS="$ARGS --db ${{ inputs.db }}"
+        ARGS="$ARGS --warehouse ${{ inputs.warehouse }}"
+        ARGS="$ARGS --output-json $REPORT_PATH"
+
+        if [ "${{ inputs.no-llm }}" = "true" ]; then
+          ARGS="$ARGS --no-llm"
+        else
+          ARGS="$ARGS --llm ${{ inputs.llm }}"
+          if [ -n "${{ inputs.llm-model }}" ]; then
+            ARGS="$ARGS --llm-model ${{ inputs.llm-model }}"
+          fi
+        fi
+
+        if [ -n "${{ inputs.pg-dsn }}" ]; then
+          ARGS="$ARGS --pg-dsn '${{ inputs.pg-dsn }}'"
+        fi
+
+        # Capture exit code without immediately failing the step
+        set +e
+        # shellcheck disable=SC2086
+        thota-dq run $ARGS
+        EXIT_CODE=$?
+        set -e
+
+        if [ "${{ inputs.fail-on-failure }}" = "true" ] && [ "$EXIT_CODE" != "0" ]; then
+          exit "$EXIT_CODE"
+        fi
+
+    - name: Parse report outputs
+      id: parse
+      if: always()
+      shell: python
+      env:
+        REPORT: ${{ steps.run.outputs.report-path }}
+        GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
+      run: |
+        import json, os
+        report = os.environ.get("REPORT", "")
+        out = os.environ.get("GITHUB_OUTPUT", "")
+        if not (report and os.path.isfile(report)):
+            raise SystemExit(0)
+        with open(report) as f:
+            d = json.load(f)
+        s = d.get("summary", {})
+        lines = [
+            f"rules-checked={s.get('total_rules', 0)}",
+            f"passed={s.get('passed', 0)}",
+            f"failed={s.get('failed', 0)}",
+            f"pass-rate={s.get('pass_rate', 0)}",
+        ]
+        if out:
+            with open(out, "a") as f:
+                f.write("\n".join(lines) + "\n")
+        else:
+            print("\n".join(lines))

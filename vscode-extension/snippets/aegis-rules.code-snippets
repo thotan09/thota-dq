@@ -1,0 +1,594 @@
+{
+  "Aegis Rule File": {
+    "prefix": "aegis-file",
+    "description": "Scaffold a new Aegis DQ rules file",
+    "body": [
+      "rules:",
+      "  - apiVersion: aegis.dev/v1",
+      "    kind: DataQualityRule",
+      "    metadata:",
+      "      id: ${1:rule_id}",
+      "      severity: ${2|critical,high,medium,low,info|}",
+      "      owner: ${3:team-name}",
+      "      tags: [${4:tag}]",
+      "    scope:",
+      "      table: ${5:table_name}",
+      "      columns: [${6:column_name}]",
+      "    logic:",
+      "      type: ${7:not_null}",
+      "$0"
+    ]
+  },
+  "Aegis Rule Block": {
+    "prefix": "aegis-rule",
+    "description": "Single Aegis DQ rule block",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:rule_id}",
+      "    severity: ${2|critical,high,medium,low,info|}",
+      "  scope:",
+      "    table: ${3:table_name}",
+      "    columns: [${4:column_name}]",
+      "  logic:",
+      "    type: ${5:not_null}",
+      "$0"
+    ]
+  },
+
+  "not_null": {
+    "prefix": ["aegis-not-null", "not_null"],
+    "description": "Column must not contain NULL values",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_not_null",
+      "    severity: ${3|high,critical,medium,low,info|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: not_null",
+      "$0"
+    ]
+  },
+
+  "not_empty_string": {
+    "prefix": ["aegis-not-empty", "not_empty_string"],
+    "description": "Column must not contain empty or whitespace-only strings",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_not_empty",
+      "    severity: ${3|medium,high,critical,low,info|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: not_empty_string",
+      "$0"
+    ]
+  },
+
+  "null_percentage_below": {
+    "prefix": ["aegis-null-pct", "null_percentage_below"],
+    "description": "NULL values must be below a percentage threshold",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_null_pct",
+      "    severity: ${3|medium,high,low,info|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: null_percentage_below",
+      "    threshold: ${4:5.0}",
+      "$0"
+    ]
+  },
+
+  "unique": {
+    "prefix": ["aegis-unique", "unique"],
+    "description": "Column values must be unique",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_unique",
+      "    severity: ${3|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: unique",
+      "$0"
+    ]
+  },
+
+  "composite_unique": {
+    "prefix": ["aegis-composite-unique", "composite_unique"],
+    "description": "Combination of columns must be unique",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_composite_unique",
+      "    severity: ${2|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${3:col_a}, ${4:col_b}]",
+      "  logic:",
+      "    type: composite_unique",
+      "$0"
+    ]
+  },
+
+  "duplicate_percentage_below": {
+    "prefix": ["aegis-dup-pct", "duplicate_percentage_below"],
+    "description": "Duplicate values must be below a percentage threshold",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_dup_pct",
+      "    severity: ${3|medium,high,low|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: duplicate_percentage_below",
+      "    threshold: ${4:1.0}",
+      "$0"
+    ]
+  },
+
+  "sql_expression": {
+    "prefix": ["aegis-sql", "sql_expression"],
+    "description": "Rows must satisfy a SQL WHERE expression",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:rule_id}",
+      "    severity: ${2|high,critical,medium,low|}",
+      "  scope:",
+      "    table: ${3:table_name}",
+      "  logic:",
+      "    type: sql_expression",
+      "    expression: \"${4:column >= 0}\"",
+      "$0"
+    ]
+  },
+
+  "between": {
+    "prefix": ["aegis-between", "between"],
+    "description": "Column values must be between min and max (inclusive)",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_between",
+      "    severity: ${3|medium,high,critical,low|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: between",
+      "    min_value: ${4:0}",
+      "    max_value: ${5:100}",
+      "$0"
+    ]
+  },
+
+  "min_value_check": {
+    "prefix": ["aegis-min", "min_value_check"],
+    "description": "Column values must meet a minimum",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_min",
+      "    severity: ${3|medium,high,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: min_value_check",
+      "    threshold: ${4:0}",
+      "$0"
+    ]
+  },
+
+  "max_value_check": {
+    "prefix": ["aegis-max", "max_value_check"],
+    "description": "Column values must not exceed a maximum",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_max",
+      "    severity: ${3|medium,high,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: max_value_check",
+      "    threshold: ${4:1000}",
+      "$0"
+    ]
+  },
+
+  "regex_match": {
+    "prefix": ["aegis-regex", "regex_match"],
+    "description": "Column values must match a regex pattern",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_format",
+      "    severity: ${3|medium,high,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: regex_match",
+      "    pattern: \"${4:^[A-Z]{2}[0-9]+$}\"",
+      "$0"
+    ]
+  },
+
+  "accepted_values": {
+    "prefix": ["aegis-accepted", "accepted_values"],
+    "description": "Column values must belong to an allowed set",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_accepted",
+      "    severity: ${3|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: accepted_values",
+      "    values: [\"${4:value1}\", \"${5:value2}\"]",
+      "$0"
+    ]
+  },
+
+  "not_accepted_values": {
+    "prefix": ["aegis-rejected", "not_accepted_values"],
+    "description": "Column values must not appear in a prohibited set",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_no_rejected",
+      "    severity: ${3|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: not_accepted_values",
+      "    values: [\"${4:bad_value}\"]",
+      "$0"
+    ]
+  },
+
+  "no_future_dates": {
+    "prefix": ["aegis-no-future", "no_future_dates"],
+    "description": "Date column must not contain future dates",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_no_future",
+      "    severity: ${3|medium,high,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: no_future_dates",
+      "$0"
+    ]
+  },
+
+  "column_exists": {
+    "prefix": ["aegis-col-exists", "column_exists"],
+    "description": "Column must exist in the table",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_exists",
+      "    severity: ${3|critical,high|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: column_exists",
+      "$0"
+    ]
+  },
+
+  "foreign_key": {
+    "prefix": ["aegis-fk", "foreign_key"],
+    "description": "Column values must exist in a referenced table",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_fk",
+      "    severity: ${3|high,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: foreign_key",
+      "    reference_table: ${4:reference_table}",
+      "    reference_column: ${5:id}",
+      "$0"
+    ]
+  },
+
+  "conditional_not_null": {
+    "prefix": ["aegis-conditional-null", "conditional_not_null"],
+    "description": "Column must not be NULL when a condition is true",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_conditional_not_null",
+      "    severity: ${3|high,medium,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: conditional_not_null",
+      "    condition: \"${4:status = 'active'}\"",
+      "$0"
+    ]
+  },
+
+  "mean_between": {
+    "prefix": ["aegis-mean", "mean_between"],
+    "description": "Column mean must be between min and max",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_mean",
+      "    severity: ${3|medium,high,low|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: mean_between",
+      "    min_value: ${4:0}",
+      "    max_value: ${5:1000}",
+      "$0"
+    ]
+  },
+
+  "stddev_below": {
+    "prefix": ["aegis-stddev", "stddev_below"],
+    "description": "Column standard deviation must not exceed threshold",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_stddev",
+      "    severity: ${3|medium,low,high|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: stddev_below",
+      "    threshold: ${4:100}",
+      "$0"
+    ]
+  },
+
+  "column_sum_between": {
+    "prefix": ["aegis-sum", "column_sum_between"],
+    "description": "Column sum must be between min and max",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_sum",
+      "    severity: ${3|high,medium,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: column_sum_between",
+      "    min_value: ${4:0}",
+      "    max_value: ${5:1000000}",
+      "$0"
+    ]
+  },
+
+  "freshness": {
+    "prefix": ["aegis-freshness", "freshness"],
+    "description": "Table must have been updated within N hours",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_freshness",
+      "    severity: ${2|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${3:updated_at}]",
+      "  logic:",
+      "    type: freshness",
+      "    threshold: ${4:24}",
+      "    unit: hours",
+      "$0"
+    ]
+  },
+
+  "date_order": {
+    "prefix": ["aegis-date-order", "date_order"],
+    "description": "First date column must be <= second date column",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_date_order",
+      "    severity: ${2|high,medium,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${3:start_date}]",
+      "  logic:",
+      "    type: date_order",
+      "    column_b: ${4:end_date}",
+      "$0"
+    ]
+  },
+
+  "row_count": {
+    "prefix": ["aegis-row-count", "row_count"],
+    "description": "Table must contain at least N rows",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_row_count",
+      "    severity: ${2|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "  logic:",
+      "    type: row_count",
+      "    threshold: ${3:1}",
+      "$0"
+    ]
+  },
+
+  "row_count_between": {
+    "prefix": ["aegis-row-count-between", "row_count_between"],
+    "description": "Table row count must be between min and max",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_row_count_between",
+      "    severity: ${2|medium,high,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "  logic:",
+      "    type: row_count_between",
+      "    min_value: ${3:100}",
+      "    max_value: ${4:1000000}",
+      "$0"
+    ]
+  },
+
+  "custom_sql": {
+    "prefix": ["aegis-custom-sql", "custom_sql"],
+    "description": "Run a fully custom SQL query that returns (passed, row_count)",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:custom_rule}",
+      "    severity: ${2|high,critical,medium,low|}",
+      "  scope:",
+      "    table: ${3:table_name}",
+      "  logic:",
+      "    type: custom_sql",
+      "    query: |",
+      "      SELECT",
+      "        COUNT(*) = 0 AS passed,",
+      "        COUNT(*) AS row_count",
+      "      FROM ${3:table_name}",
+      "      WHERE ${4:condition}",
+      "$0"
+    ]
+  },
+
+  "row_count_match": {
+    "prefix": ["aegis-row-match", "row_count_match"],
+    "description": "Two tables must have the same row count (within tolerance)",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_vs_${2:source}_row_count",
+      "    severity: ${3|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "  logic:",
+      "    type: row_count_match",
+      "    source_table: ${2:source_table}",
+      "    tolerance_pct: ${4:0}",
+      "$0"
+    ]
+  },
+
+  "column_sum_match": {
+    "prefix": ["aegis-sum-match", "column_sum_match"],
+    "description": "Column sum must match between two tables",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_sum_match",
+      "    severity: ${3|high,critical,medium|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: column_sum_match",
+      "    source_table: ${4:source_table}",
+      "    tolerance_pct: ${5:0}",
+      "$0"
+    ]
+  },
+
+  "set_inclusion": {
+    "prefix": ["aegis-set-inclusion", "set_inclusion"],
+    "description": "All values in target column must exist in source column",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_set_inclusion",
+      "    severity: ${3|high,medium,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: set_inclusion",
+      "    reference_table: ${4:source_table}",
+      "    reference_column: ${5:id}",
+      "$0"
+    ]
+  },
+
+  "set_equality": {
+    "prefix": ["aegis-set-equality", "set_equality"],
+    "description": "Column value sets must be identical between two tables",
+    "body": [
+      "- apiVersion: aegis.dev/v1",
+      "  kind: DataQualityRule",
+      "  metadata:",
+      "    id: ${1:table}_${2:column}_set_equality",
+      "    severity: ${3|high,medium,critical|}",
+      "  scope:",
+      "    table: ${1:table}",
+      "    columns: [${2:column}]",
+      "  logic:",
+      "    type: set_equality",
+      "    reference_table: ${4:source_table}",
+      "    reference_column: ${5:id}",
+      "$0"
+    ]
+  }
+}
