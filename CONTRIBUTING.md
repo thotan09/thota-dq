@@ -1,6 +1,6 @@
-# Contributing to Aegis DQ
+# Contributing to Thota DQ
 
-Thanks for your interest in contributing. Aegis DQ is an open-source project and welcomes pull requests, bug reports, docs improvements, and new adapters or rule types. This guide covers everything you need to go from zero to a merged PR.
+Thanks for your interest in contributing. Thota DQ is an open-source project and welcomes pull requests, bug reports, docs improvements, and new adapters or rule types. This guide covers everything you need to go from zero to a merged PR.
 
 ---
 
@@ -8,8 +8,8 @@ Thanks for your interest in contributing. Aegis DQ is an open-source project and
 
 ```bash
 # fork the repo on GitHub, then clone your fork
-git clone https://github.com/<your-username>/aegis-dq
-cd aegis-dq
+git clone https://github.com/<your-username>/thota-dq
+cd thota-dq
 
 # install with all dev dependencies
 pip install -e ".[dev]"
@@ -18,7 +18,7 @@ pip install -e ".[dev]"
 pytest tests/ -q
 ```
 
-You should see 292 tests pass. If anything is red, open an issue before going further.
+You should see 531 tests pass. If anything is red, open an issue before going further.
 
 ---
 
@@ -30,24 +30,24 @@ You should see 292 tests pass. If anything is red, open an issue before going fu
 | New rule type | `cross_table_count_match` and others (see below) |
 | New LLM adapter | Bedrock, Vertex AI, Cohere |
 | Documentation | Tutorials, how-to guides, docstrings |
-| Bug fixes | Check the [issue tracker](https://github.com/aegis-dq/aegis-dq/issues) |
+| Bug fixes | Check the [issue tracker](https://github.com/thotan09/thota-dq/issues) |
 
 ---
 
 ## How to add a new warehouse adapter
 
-Use `aegis/adapters/athena.py` as your reference implementation.
+Use `thota_dq/adapters/athena.py` as your reference implementation.
 
 **Step 1 — create the adapter file**
 
 ```
-aegis/adapters/<name>.py
+thota_dq/adapters/<name>.py
 ```
 
 **Step 2 — extend `WarehouseAdapter`**
 
 ```python
-from aegis.adapters.base import WarehouseAdapter
+from thota_dq.adapters.base import WarehouseAdapter
 
 class SnowflakeAdapter(WarehouseAdapter):
     def __init__(self, **kwargs):
@@ -69,11 +69,11 @@ Translate the rule's `logic.type` to SQL using the same dispatch pattern as `Duc
 
 **Step 4 — register the adapter in the CLI**
 
-In `aegis/cli.py`, find the `_build_warehouse_adapter` function and add an `elif` branch:
+In `thota_dq/cli/main.py`, find the `_build_warehouse_adapter` function and add an `elif` branch:
 
 ```python
 elif warehouse == "snowflake":
-    from aegis.adapters.snowflake import SnowflakeAdapter
+    from thota_dq.adapters.snowflake import SnowflakeAdapter
     return SnowflakeAdapter(**connection_kwargs)
 ```
 
@@ -91,7 +91,7 @@ connector_stub = types.ModuleType("snowflake.connector")
 sys.modules["snowflake"] = snowflake_stub
 sys.modules["snowflake.connector"] = connector_stub
 
-from aegis.adapters.snowflake import SnowflakeAdapter
+from thota_dq.adapters.snowflake import SnowflakeAdapter
 
 def test_execute_rule_not_null(monkeypatch):
     adapter = SnowflakeAdapter(account="x", user="y", password="z", database="d", schema="s")
@@ -107,7 +107,7 @@ See `tests/test_athena_adapter.py` for a complete example.
 
 **Step 1 — add the type to the `RuleType` enum**
 
-In `aegis/models.py`:
+In `thota_dq/rules/schema.py`:
 
 ```python
 class RuleType(StrEnum):
@@ -117,7 +117,7 @@ class RuleType(StrEnum):
 
 **Step 2 — add a handler in each adapter**
 
-In `aegis/adapters/duckdb.py` (and BigQuery, Databricks, Athena adapters), add a branch to the rule dispatch:
+In `thota_dq/adapters/warehouse/duckdb.py` (and BigQuery, Databricks, Athena adapters), add a branch to the rule dispatch:
 
 ```python
 elif rule.logic.type == RuleType.CROSS_TABLE_COUNT_MATCH:
@@ -130,7 +130,7 @@ elif rule.logic.type == RuleType.CROSS_TABLE_COUNT_MATCH:
 
 **Step 3 — update the validator**
 
-In `aegis/validator.py`, add any required field checks for the new type so `aegis validate` catches misconfigured rules early:
+In `thota_dq/rules/validator.py`, add any required field checks for the new type so `thota-dq validate` catches misconfigured rules early:
 
 ```python
 if rule.logic.type == RuleType.CROSS_TABLE_COUNT_MATCH:
@@ -144,15 +144,15 @@ if rule.logic.type == RuleType.CROSS_TABLE_COUNT_MATCH:
 
 These are concrete, self-contained, and well-scoped for a first contribution:
 
-1. **Add a Snowflake adapter** — copy `aegis/adapters/athena.py`, adapt the SQL dialect (use `snowflake-connector-python`), stub the dep in tests. Issue: [#snowflake](https://github.com/aegis-dq/aegis-dq/issues)
+1. **Add a Snowflake adapter** — copy `thota_dq/adapters/athena.py`, adapt the SQL dialect (use `snowflake-connector-python`), stub the dep in tests. Issue: [#snowflake](https://github.com/thotan09/thota-dq/issues)
 
 2. **Add a Postgres / Redshift adapter** — same pattern, use `psycopg2`. The SQL dialect is close to DuckDB so the translation layer is small.
 
 3. **Add a `cross_table_count_match` rule type** — validates that two tables have the same row count. Follow the 3-step guide above.
 
-4. **Write a tutorial blog post** — a 1000-word walkthrough using Aegis with a public dataset (NYC taxi, TPC-H, etc.). Drop it in `docs/tutorials/`.
+4. **Write a tutorial blog post** — a 1000-word walkthrough using Thota DQ with a public dataset (NYC taxi, TPC-H, etc.). Drop it in `docs/tutorials/`.
 
-5. **Improve error messages in the validator** — `aegis validate` currently prints terse errors. Add line numbers, suggested fixes, and links to the rule schema reference.
+5. **Improve error messages in the validator** — `thota-dq validate` currently prints terse errors. Add line numbers, suggested fixes, and links to the rule schema reference.
 
 ---
 
@@ -183,14 +183,14 @@ This keeps CI fast and dependency-free while still testing adapter logic.
 
 ## Code style
 
-Aegis uses `ruff` for linting and formatting.
+Thota DQ uses `ruff` for linting and formatting.
 
 ```bash
 # lint
-ruff check aegis tests
+ruff check thota_dq tests
 
 # format
-ruff format aegis tests
+ruff format thota_dq tests
 ```
 
 Both run in CI. A PR with lint failures will not be merged. Configure your editor to run `ruff format` on save to avoid surprises.
@@ -219,7 +219,7 @@ docs: add Athena quickstart to getting-started guide
 **Before opening a PR:**
 
 - [ ] `pytest tests/ -q` passes locally
-- [ ] `ruff check aegis tests` is clean
+- [ ] `ruff check thota_dq tests` is clean
 - [ ] New adapter or rule type has tests
 - [ ] If adding a new adapter, add it to the warehouse table in `README.md`
 

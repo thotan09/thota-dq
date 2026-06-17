@@ -4,14 +4,14 @@
 
 | Version | Supported |
 |---|---|
-| 0.5.x (latest) | ✅ |
-| < 0.5 | ❌ |
+| 0.7.x (latest) | ✅ |
+| < 0.7 | ❌ |
 
 ## Reporting a vulnerability
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Email **security@aegis-dq.dev** with:
+Email **thotan09@gmail.com** with:
 
 - A description of the vulnerability and its potential impact
 - Steps to reproduce or proof-of-concept code
@@ -23,11 +23,11 @@ You will receive an acknowledgment within **48 hours** and a resolution timeline
 
 - **API keys** — pass provider keys via `${{ secrets.* }}`, never hard-coded in workflow YAML
 - **DuckDB files** — the action opens your database in read-only mode; it never writes to it
-- **LLM data** — rule failure samples are sent to your configured LLM provider; avoid including PII in column values checked by Aegis, or use `no-llm: 'true'` for offline validation
+- **LLM data** — rule failure samples are sent to your configured LLM provider; avoid including PII in column values checked by Thota DQ, or use `no-llm: 'true'` for offline validation
 - **Pinning versions** — for supply-chain safety, pin to a specific SHA:
 
 ```yaml
-- uses: aegis-dq/aegis-dq@<COMMIT_SHA>   # pin to a specific commit
+- uses: thotan09/thota-dq@<COMMIT_SHA>   # pin to a specific commit
 ```
 
 Use [Dependabot](https://docs.github.com/en/code-security/dependabot) to keep pins current automatically.
