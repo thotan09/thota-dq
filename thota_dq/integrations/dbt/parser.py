@@ -120,7 +120,7 @@ def dbt_test_to_rule(node_key: str, node: dict, manifest: dict) -> DataQualityRu
 
     return DataQualityRule(
         **{
-            "apiVersion": "aegis.dev/v1",
+            "apiVersion": "thota_dq.dev/v1",
             "kind": "DataQualityRule",
             "metadata": metadata,
             "scope": scope,

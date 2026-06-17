@@ -1,5 +1,5 @@
 rules:
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -13,7 +13,7 @@ rules:
     columns:
     - customer_id
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique
@@ -27,7 +27,7 @@ rules:
     columns:
     - customer_id
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -45,7 +45,7 @@ rules:
     columns:
     - kyc_status
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -63,7 +63,7 @@ rules:
     columns:
     - risk_tier
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -77,7 +77,7 @@ rules:
     columns:
     - full_name
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -91,7 +91,7 @@ rules:
     columns:
     - dob
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: (kyc_status = 'verified' AND kyc_verified_at IS NOT NULL) OR (kyc_status
@@ -105,7 +105,7 @@ rules:
     version: 1.0.0
   scope:
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null

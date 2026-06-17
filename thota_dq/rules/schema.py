@@ -197,7 +197,7 @@ class RuleMetadata(BaseModel):
 
 
 class DataQualityRule(BaseModel):
-    api_version: str = Field("aegis.dev/v1", alias="apiVersion")
+    api_version: str = Field("thota_dq.dev/v1", alias="apiVersion")
     kind: str = "DataQualityRule"
     metadata: RuleMetadata
     spec_scope: RuleScope = Field(..., alias="scope")

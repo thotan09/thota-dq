@@ -1,23 +1,54 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "name": "Aegis Rules",
-  "scopeName": "source.aegis-rules",
-  "fileTypes": [".aegis.yaml", ".aegis.yml"],
+  "name": "Thota Rules",
+  "scopeName": "source.thota-rules",
+  "fileTypes": [
+    ".thota-dq.yaml",
+    ".thota-dq.yml"
+  ],
   "patterns": [
-    { "include": "#comments" },
-    { "include": "#document_start" },
-    { "include": "#aegis_keys" },
-    { "include": "#severity_values" },
-    { "include": "#rule_type_values" },
-    { "include": "#warehouse_values" },
-    { "include": "#api_version" },
-    { "include": "#kind_value" },
-    { "include": "#sql_block" },
-    { "include": "#yaml_string" },
-    { "include": "#yaml_number" },
-    { "include": "#yaml_bool" },
-    { "include": "#yaml_null" },
-    { "include": "#yaml_list_item" }
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#document_start"
+    },
+    {
+      "include": "#aegis_keys"
+    },
+    {
+      "include": "#severity_values"
+    },
+    {
+      "include": "#rule_type_values"
+    },
+    {
+      "include": "#warehouse_values"
+    },
+    {
+      "include": "#api_version"
+    },
+    {
+      "include": "#kind_value"
+    },
+    {
+      "include": "#sql_block"
+    },
+    {
+      "include": "#yaml_string"
+    },
+    {
+      "include": "#yaml_number"
+    },
+    {
+      "include": "#yaml_bool"
+    },
+    {
+      "include": "#yaml_null"
+    },
+    {
+      "include": "#yaml_list_item"
+    }
   ],
   "repository": {
     "comments": {
@@ -33,49 +64,65 @@
         {
           "match": "^(rules|metadata|scope|logic|reconciliation|diagnosis|remediation|sla)\\s*:",
           "captures": {
-            "1": { "name": "keyword.other.aegis.section" }
+            "1": {
+              "name": "keyword.other.aegis.section"
+            }
           }
         },
         {
           "match": "^\\s+(apiVersion|kind)\\s*:",
           "captures": {
-            "1": { "name": "keyword.other.aegis.top-level" }
+            "1": {
+              "name": "keyword.other.aegis.top-level"
+            }
           }
         },
         {
           "match": "^\\s+(id|severity|domain|owner|tags|description)\\s*:",
           "captures": {
-            "1": { "name": "variable.other.aegis.metadata" }
+            "1": {
+              "name": "variable.other.aegis.metadata"
+            }
           }
         },
         {
           "match": "^\\s+(warehouse|database|schema|table|columns)\\s*:",
           "captures": {
-            "1": { "name": "variable.other.aegis.scope" }
+            "1": {
+              "name": "variable.other.aegis.scope"
+            }
           }
         },
         {
           "match": "^\\s+(type|expression|query|threshold|unit|min_value|max_value|pattern|values|reference_table|reference_column|condition|column_b|source_table|tolerance_pct)\\s*:",
           "captures": {
-            "1": { "name": "variable.other.aegis.logic" }
+            "1": {
+              "name": "variable.other.aegis.logic"
+            }
           }
         },
         {
           "match": "^\\s+(common_causes|lineage_hints)\\s*:",
           "captures": {
-            "1": { "name": "variable.other.aegis.diagnosis" }
+            "1": {
+              "name": "variable.other.aegis.diagnosis"
+            }
           }
         },
         {
           "match": "^\\s+(auto_remediate|proposal_strategy)\\s*:",
           "captures": {
-            "1": { "name": "variable.other.aegis.remediation" }
+            "1": {
+              "name": "variable.other.aegis.remediation"
+            }
           }
         },
         {
           "match": "^\\s+(detection_window|notification_target)\\s*:",
           "captures": {
-            "1": { "name": "variable.other.aegis.sla" }
+            "1": {
+              "name": "variable.other.aegis.sla"
+            }
           }
         }
       ]
@@ -105,10 +152,16 @@
       "begin": "(expression|query):\\s*[|>]",
       "end": "^(?=\\S)",
       "beginCaptures": {
-        "1": { "name": "variable.other.aegis.logic" }
+        "1": {
+          "name": "variable.other.aegis.logic"
+        }
       },
       "contentName": "meta.embedded.block.sql",
-      "patterns": [{ "include": "source.sql" }]
+      "patterns": [
+        {
+          "include": "source.sql"
+        }
+      ]
     },
     "yaml_string": {
       "patterns": [

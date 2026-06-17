@@ -1,5 +1,5 @@
 rules:
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -13,7 +13,7 @@ rules:
     columns:
     - account_id
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -27,7 +27,7 @@ rules:
     columns:
     - customer_id
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -46,7 +46,7 @@ rules:
     columns:
     - account_type
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -65,7 +65,7 @@ rules:
     columns:
     - status
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: opened_date <= last_activity_date
@@ -78,7 +78,7 @@ rules:
     version: 1.0.0
   scope:
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT a.account_id, a.customer_id, a.country_code, c.country_of_residence,
@@ -101,7 +101,7 @@ rules:
     version: 1.0.0
   scope:
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -115,7 +115,7 @@ rules:
     columns:
     - opened_date
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null

@@ -1,4 +1,4 @@
-"""Aegis CLI — main entry point."""
+"""Thota DQ CLI — main entry point."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ logging.captureWarnings(True)
 logging.getLogger("py.warnings").addHandler(logging.NullHandler())
 logging.getLogger("py.warnings").propagate = False
 
-app = typer.Typer(help="Aegis — agentic data quality framework")
+app = typer.Typer(help="Thota DQ — agentic data quality framework")
 console = Console()
 
 rules_app = typer.Typer(help="Manage built-in rule templates")
@@ -34,7 +34,7 @@ def init(
     warehouse: str = typer.Option("duckdb", "--warehouse", "-w", help="Default warehouse type"),
     force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing files"),
 ) -> None:
-    """Scaffold a new Aegis project — creates thota-dq.yaml, folder structure, and a starter pipeline."""
+    """Scaffold a new Thota DQ project — creates thota-dq.yaml, folder structure, and a starter pipeline."""
     directory = directory.resolve()
     directory.mkdir(parents=True, exist_ok=True)
 
@@ -120,7 +120,7 @@ goal: |
 # pipelines/{name}/rules.yaml
 # Add your data quality rules here. Run `thota-dq validate ./rules.yaml` to check syntax.
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: example_not_null
@@ -131,7 +131,7 @@ rules:
     logic:
       type: not_null
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: example_positive_amount
@@ -369,7 +369,7 @@ async def _run(
 
     # Print summary table
     s = report.get("summary", {})
-    table = Table(title="Aegis Validation Report")
+    table = Table(title="Thota DQ Validation Report")
     table.add_column("Metric", style="cyan")
     table.add_column("Value", style="white")
     table.add_row("Rules checked", str(s.get("total_rules", 0)))
@@ -465,7 +465,7 @@ def validate(
 
     report = validate_file(config, check_sql=check_sql, conn=conn)
 
-    console.print(f"\n[bold blue]Aegis validate[/bold blue] — {config}\n")
+    console.print(f"\n[bold blue]Thota DQ validate[/bold blue] — {config}\n")
 
     for r in report.results:
         label = r.rule_id or f"rule[{r.index}]"
@@ -729,7 +729,7 @@ def dbt_generate(
         "duckdb", "--warehouse", "-w", help="Warehouse type for generated rules"
     ),
 ) -> None:
-    """Generate Aegis rules YAML from a dbt manifest.json."""
+    """Generate Thota DQ rules YAML from a dbt manifest.json."""
     from ..integrations.dbt.parser import load_manifest, manifest_to_yaml
 
     if not manifest.exists():
@@ -891,7 +891,7 @@ def mcp(
     port: int = typer.Option(8765, "--port", "-p", help="Port to listen on"),
     transport: str = typer.Option("stdio", "--transport", help="Transport: stdio|sse"),
 ) -> None:
-    """Start the Aegis MCP server for tool use by Claude and other LLMs."""
+    """Start the Thota DQ MCP server for tool use by Claude and other LLMs."""
     from .mcp_runner import run_mcp_server
 
     run_mcp_server(host=host, port=port, transport=transport)
@@ -916,7 +916,7 @@ def rules_list(
         console.print_json(json.dumps(data))
         return
 
-    table = Table(title="Aegis Built-in Rule Templates")
+    table = Table(title="Thota DQ Built-in Rule Templates")
     table.add_column("Name", style="cyan", no_wrap=True)
     table.add_column("Category", style="magenta")
     table.add_column("Description", style="white")
@@ -984,7 +984,7 @@ def serve(
     llm_model: str | None = typer.Option(None, "--llm-model", help="Override model name"),
     reload: bool = typer.Option(False, "--reload", help="Auto-reload on code changes (dev mode)"),
 ) -> None:
-    """Start the Aegis REST API server."""
+    """Start the Thota DQ REST API server."""
     try:
         import uvicorn
     except ImportError:

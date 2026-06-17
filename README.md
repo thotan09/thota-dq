@@ -329,7 +329,7 @@ Example rule:
 
 ```yaml
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_revenue_non_negative

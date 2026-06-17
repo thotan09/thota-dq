@@ -32,7 +32,7 @@ class EvalTask:
 def _rule(rule_id: str, table: str, logic: dict, severity: str = "high",
           columns: list[str] | None = None) -> dict:
     return {
-        "apiVersion": "aegis.dev/v1",
+        "apiVersion": "thota_dq.dev/v1",
         "kind": "DataQualityRule",
         "metadata": {"id": rule_id, "severity": severity},
         "scope": {"table": table, "columns": columns or []},

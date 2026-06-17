@@ -1,5 +1,5 @@
 rules:
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -13,7 +13,7 @@ rules:
     columns:
     - counterparty_id
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -27,7 +27,7 @@ rules:
     columns:
     - name
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -41,7 +41,7 @@ rules:
     columns:
     - account_number
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -55,7 +55,7 @@ rules:
     columns:
     - bank_code
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -69,7 +69,7 @@ rules:
     columns:
     - country_code
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -87,7 +87,7 @@ rules:
     columns:
     - entity_type
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT c.counterparty_id, c.name
@@ -108,7 +108,7 @@ rules:
     version: 1.0.0
   scope:
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique

@@ -35,8 +35,14 @@
     "languages": [
       {
         "id": "thota-rules",
-        "aliases": ["Aegis Rules", "thota-rules"],
-        "extensions": [".aegis.yaml", ".aegis.yml"],
+        "aliases": [
+          "Thota Rules",
+          "thota-rules"
+        ],
+        "extensions": [
+          ".thota-dq.yaml",
+          ".thota-dq.yml"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -62,8 +68,13 @@
     ],
     "jsonValidation": [
       {
-        "fileMatch": ["*.aegis.yaml", "*.aegis.yml", "rules.yaml", "rules.yml"],
-        "url": "./schemas/aegis-rule.json"
+        "fileMatch": [
+          "*.thota-dq.yaml",
+          "*.thota-dq.yml",
+          "rules.yaml",
+          "rules.yml"
+        ],
+        "url": "./schemas/thota-rule.json"
       }
     ],
     "configuration": {

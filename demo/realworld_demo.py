@@ -159,7 +159,7 @@ def build_rules():
     specs = [
         # ── CUSTOMERS ────────────────────────────────────────────────────
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "customers_email_not_null", "severity": "critical",
                          "owner": "data-platform", "tags": ["completeness", "pii"]},
             "scope": {"table": "customers", "columns": ["email"]},
@@ -168,7 +168,7 @@ def build_rules():
                           "lineage_hints": {"customers": ["email", "customer_id"]}},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "customers_email_not_empty", "severity": "high",
                          "owner": "data-platform", "tags": ["completeness", "pii"]},
             "scope": {"table": "customers", "columns": ["email"]},
@@ -177,7 +177,7 @@ def build_rules():
                                             "Form validation bypassed"]},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "customers_tier_accepted", "severity": "medium",
                          "owner": "crm-team", "tags": ["validity", "classification"]},
             "scope": {"table": "customers", "columns": ["tier"]},
@@ -188,7 +188,7 @@ def build_rules():
         },
         # ── PRODUCTS ────────────────────────────────────────────────────
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "products_price_positive", "severity": "critical",
                          "owner": "catalog-team", "tags": ["validity", "financial"]},
             "scope": {"table": "products", "columns": ["price"]},
@@ -198,7 +198,7 @@ def build_rules():
                           "lineage_hints": {"products": ["price", "sku"]}},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "products_sku_unique", "severity": "critical",
                          "owner": "catalog-team", "tags": ["uniqueness"]},
             "scope": {"table": "products", "columns": ["sku"]},
@@ -207,7 +207,7 @@ def build_rules():
                                             "Duplicate import from supplier feed"]},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "products_stock_non_negative", "severity": "high",
                          "owner": "inventory-team", "tags": ["validity"]},
             "scope": {"table": "products", "columns": ["stock_qty"]},
@@ -217,7 +217,7 @@ def build_rules():
         },
         # ── ORDERS ───────────────────────────────────────────────────────
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "orders_amount_positive", "severity": "critical",
                          "owner": "finance-team", "tags": ["validity", "financial"]},
             "scope": {"table": "orders", "columns": ["total_amount"]},
@@ -228,7 +228,7 @@ def build_rules():
                                             "products": ["price"]}},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "orders_status_valid", "severity": "high",
                          "owner": "ops-team", "tags": ["validity"]},
             "scope": {"table": "orders", "columns": ["status"]},
@@ -238,7 +238,7 @@ def build_rules():
                                             "Legacy migration not normalised"]},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "orders_date_order", "severity": "high",
                          "owner": "ops-team", "tags": ["timeliness"]},
             "scope": {"table": "orders", "columns": ["order_date"]},
@@ -247,7 +247,7 @@ def build_rules():
                                             "Backfilled ship_date used wrong reference"]},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "orders_customer_fk", "severity": "critical",
                          "owner": "data-platform", "tags": ["referential"]},
             "scope": {"table": "orders", "columns": ["customer_id"]},
@@ -259,7 +259,7 @@ def build_rules():
         },
         # ── PAYMENTS ────────────────────────────────────────────────────
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "payments_amount_non_zero", "severity": "critical",
                          "owner": "finance-team", "tags": ["validity", "financial"]},
             "scope": {"table": "payments", "columns": ["amount"]},
@@ -269,7 +269,7 @@ def build_rules():
                           "lineage_hints": {"orders": ["total_amount", "order_id"]}},
         },
         {
-            "apiVersion": "aegis.dev/v1", "kind": "DataQualityRule",
+            "apiVersion": "thota_dq.dev/v1", "kind": "DataQualityRule",
             "metadata": {"id": "payments_order_fk", "severity": "critical",
                          "owner": "finance-team", "tags": ["referential"]},
             "scope": {"table": "payments", "columns": ["order_id"]},

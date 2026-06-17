@@ -18,7 +18,7 @@ def write_yaml(tmp_path, content: str):
 def test_valid_not_null(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata:
               id: test_not_null
               severity: critical
@@ -39,7 +39,7 @@ def test_valid_not_null(tmp_path):
 def test_valid_sql_expression(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: revenue_positive, severity: high}
             scope: {table: orders}
             logic: {type: sql_expression, expression: "revenue >= 0"}
@@ -51,11 +51,11 @@ def test_valid_sql_expression(tmp_path):
 def test_valid_multiple_rules(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: rule_a, severity: high}
             scope: {table: orders, columns: [order_id]}
             logic: {type: not_null}
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: rule_b, severity: medium}
             scope: {table: orders}
             logic: {type: row_count, threshold: 1}
@@ -69,7 +69,7 @@ def test_valid_multiple_rules(tmp_path):
 def test_valid_between_with_required_fields(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: age_range, severity: medium}
             scope: {table: customers, columns: [age]}
             logic: {type: between, min_value: 0, max_value: 120}
@@ -81,7 +81,7 @@ def test_valid_between_with_required_fields(tmp_path):
 def test_valid_regex_match(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: email_fmt, severity: medium}
             scope: {table: customers, columns: [email]}
             logic:
@@ -95,7 +95,7 @@ def test_valid_regex_match(tmp_path):
 def test_valid_foreign_key(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: fk_check, severity: high}
             scope: {table: orders, columns: [customer_id]}
             logic:
@@ -135,7 +135,7 @@ def test_empty_file(tmp_path):
 def test_missing_required_metadata_id(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {severity: high}
             scope: {table: orders}
             logic: {type: not_null}
@@ -148,7 +148,7 @@ def test_missing_required_metadata_id(tmp_path):
 def test_invalid_severity_enum(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_rule, severity: ultra_critical}
             scope: {table: orders}
             logic: {type: not_null}
@@ -160,7 +160,7 @@ def test_invalid_severity_enum(tmp_path):
 def test_invalid_rule_type_enum(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_rule, severity: high}
             scope: {table: orders}
             logic: {type: invented_type}
@@ -172,7 +172,7 @@ def test_invalid_rule_type_enum(tmp_path):
 def test_missing_table_in_scope(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: no_table, severity: high}
             scope: {columns: [order_id]}
             logic: {type: not_null}
@@ -186,7 +186,7 @@ def test_missing_table_in_scope(tmp_path):
 def test_between_missing_min_max(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_between, severity: high}
             scope: {table: t, columns: [col]}
             logic: {type: between}
@@ -201,7 +201,7 @@ def test_between_missing_min_max(tmp_path):
 def test_regex_missing_pattern(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_regex, severity: medium}
             scope: {table: t, columns: [col]}
             logic: {type: regex_match}
@@ -214,7 +214,7 @@ def test_regex_missing_pattern(tmp_path):
 def test_accepted_values_missing_values_list(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_accepted, severity: high}
             scope: {table: t, columns: [status]}
             logic: {type: accepted_values}
@@ -227,7 +227,7 @@ def test_accepted_values_missing_values_list(tmp_path):
 def test_column_required_but_missing(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: no_col, severity: high}
             scope: {table: orders}
             logic: {type: not_null}
@@ -240,7 +240,7 @@ def test_column_required_but_missing(tmp_path):
 def test_foreign_key_missing_reference(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_fk, severity: high}
             scope: {table: orders, columns: [customer_id]}
             logic: {type: foreign_key}
@@ -257,11 +257,11 @@ def test_foreign_key_missing_reference(tmp_path):
 def test_mixed_valid_and_invalid(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: good_rule, severity: high}
             scope: {table: orders, columns: [order_id]}
             logic: {type: not_null}
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: bad_rule, severity: bogus_level}
             scope: {table: orders}
             logic: {type: not_null}
@@ -278,7 +278,7 @@ def test_mixed_valid_and_invalid(tmp_path):
 def test_warns_on_missing_description(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: no_desc, severity: high}
             scope: {table: orders, columns: [order_id]}
             logic: {type: not_null}
@@ -291,7 +291,7 @@ def test_warns_on_missing_description(tmp_path):
 def test_warns_on_missing_owner(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata: {id: no_owner, severity: high, description: Something}
             scope: {table: orders, columns: [order_id]}
             logic: {type: not_null}
@@ -304,7 +304,7 @@ def test_warns_on_missing_owner(tmp_path):
 def test_no_warnings_on_complete_rule(tmp_path):
     f = write_yaml(tmp_path, """
         rules:
-          - apiVersion: aegis.dev/v1
+          - apiVersion: thota_dq.dev/v1
             metadata:
               id: complete_rule
               severity: high

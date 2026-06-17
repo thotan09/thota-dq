@@ -1,5 +1,5 @@
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_order_id_not_null
@@ -19,7 +19,7 @@ rules:
         - "ETL pipeline failed mid-load"
         - "Source system sent partial records"
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_revenue_positive
@@ -40,7 +40,7 @@ rules:
         - "Currency conversion failure"
         - "Test data leaked to prod"
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_minimum_rows
@@ -56,7 +56,7 @@ rules:
       type: row_count
       threshold: 1
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_order_id_unique

@@ -21,7 +21,7 @@ from thota_dq.server.models import RunStatus
 
 RULES_YAML = """\
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: test_rule

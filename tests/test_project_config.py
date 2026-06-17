@@ -15,7 +15,7 @@ from thota_dq.pipeline.manifest import PipelineManifest
 
 class TestAegisProjectLoad:
     def test_load_full_config(self, tmp_path):
-        cfg = tmp_path / "thota_dq.yaml"
+        cfg = tmp_path / "thota-dq.yaml"
         cfg.write_text(
             textwrap.dedent("""\
             default_llm:
@@ -40,14 +40,14 @@ class TestAegisProjectLoad:
         assert project.root == tmp_path.resolve()
 
     def test_load_minimal_config(self, tmp_path):
-        cfg = tmp_path / "thota_dq.yaml"
+        cfg = tmp_path / "thota-dq.yaml"
         cfg.write_text("{}\n")
         project = AegisProject.load(cfg)
         assert project.default_llm.provider == "anthropic"
         assert project.default_warehouse.type == "duckdb"
 
     def test_load_empty_file(self, tmp_path):
-        cfg = tmp_path / "thota_dq.yaml"
+        cfg = tmp_path / "thota-dq.yaml"
         cfg.write_text("")
         project = AegisProject.load(cfg)
         assert project.default_llm.provider == "anthropic"
@@ -55,7 +55,7 @@ class TestAegisProjectLoad:
 
 class TestAegisProjectFind:
     def test_finds_in_parent(self, tmp_path):
-        (tmp_path / "thota_dq.yaml").write_text("default_llm:\n  provider: bedrock\n")
+        (tmp_path / "thota-dq.yaml").write_text("default_llm:\n  provider: bedrock\n")
         nested = tmp_path / "pipelines" / "fraud"
         nested.mkdir(parents=True)
         project = AegisProject.find(nested)
@@ -63,7 +63,7 @@ class TestAegisProjectFind:
         assert project.default_llm.provider == "bedrock"
 
     def test_finds_in_same_dir(self, tmp_path):
-        (tmp_path / "thota_dq.yaml").write_text("{}\n")
+        (tmp_path / "thota-dq.yaml").write_text("{}\n")
         project = AegisProject.find(tmp_path)
         assert project is not None
 
@@ -78,23 +78,23 @@ class TestAegisProjectFind:
         assert project is None or isinstance(project, AegisProject)
 
     def test_nearest_wins(self, tmp_path):
-        (tmp_path / "thota_dq.yaml").write_text("default_llm:\n  provider: anthropic\n")
+        (tmp_path / "thota-dq.yaml").write_text("default_llm:\n  provider: anthropic\n")
         sub = tmp_path / "sub"
         sub.mkdir()
-        (sub / "thota_dq.yaml").write_text("default_llm:\n  provider: openai\n")
+        (sub / "thota-dq.yaml").write_text("default_llm:\n  provider: openai\n")
         project = AegisProject.find(sub)
         assert project is not None
         assert project.default_llm.provider == "openai"
 
     def test_resolve_db_path_relative(self, tmp_path):
-        (tmp_path / "thota_dq.yaml").write_text("audit:\n  db_path: .thota_dq/history.db\n")
-        project = AegisProject.load(tmp_path / "thota_dq.yaml")
+        (tmp_path / "thota-dq.yaml").write_text("audit:\n  db_path: .thota_dq/history.db\n")
+        project = AegisProject.load(tmp_path / "thota-dq.yaml")
         assert project.resolve_db_path() == tmp_path / ".thota_dq" / "history.db"
 
     def test_resolve_db_path_absolute(self, tmp_path):
         abs_path = "/var/thota_dq/history.db"
-        (tmp_path / "thota_dq.yaml").write_text(f"audit:\n  db_path: {abs_path}\n")
-        project = AegisProject.load(tmp_path / "thota_dq.yaml")
+        (tmp_path / "thota-dq.yaml").write_text(f"audit:\n  db_path: {abs_path}\n")
+        project = AegisProject.load(tmp_path / "thota-dq.yaml")
         assert project.resolve_db_path() == Path(abs_path)
 
 
@@ -105,7 +105,7 @@ class TestAegisProjectFind:
 
 class TestPipelineManifestInheritance:
     def _write_project(self, root: Path, provider="openai", warehouse_type="bigquery"):
-        (root / "thota_dq.yaml").write_text(
+        (root / "thota-dq.yaml").write_text(
             textwrap.dedent(f"""\
             default_llm:
               provider: {provider}

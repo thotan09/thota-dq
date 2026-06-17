@@ -53,7 +53,7 @@ Metadata requirements per rule:
 Output ONLY a YAML code block in this exact format:
 ```yaml
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: transactions_amount_not_null
@@ -66,7 +66,7 @@ rules:
     logic:
       type: not_null
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: transactions_status_valid_values
@@ -80,7 +80,7 @@ rules:
       type: accepted_values
       values: [pending, settled, reversed, flagged]
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: transactions_amount_positive
@@ -93,7 +93,7 @@ rules:
       type: sql_expression
       expression: "amount_usd > 0"
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: transactions_ctr_filing_required

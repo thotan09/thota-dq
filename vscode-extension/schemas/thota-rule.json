@@ -21,8 +21,8 @@
       "properties": {
         "apiVersion": {
           "type": "string",
-          "const": "aegis.dev/v1",
-          "description": "API version. Must be 'aegis.dev/v1'."
+          "const": "thota_dq.dev/v1",
+          "description": "API version. Must be 'thota_dq.dev/v1'."
         },
         "kind": {
           "type": "string",

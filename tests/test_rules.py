@@ -10,7 +10,7 @@ from thota_dq.rules.schema import DataQualityRule, RuleType, Severity
 
 SAMPLE_YAML = """\
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: test_not_null
@@ -24,7 +24,7 @@ rules:
 
 MULTI_RULE_YAML = """\
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: rule_one
@@ -35,7 +35,7 @@ rules:
     logic:
       type: unique
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: rule_two
@@ -48,7 +48,7 @@ rules:
 """
 
 SPEC_NESTED_YAML = """\
-apiVersion: aegis.dev/v1
+apiVersion: thota_dq.dev/v1
 kind: DataQualityRule
 metadata:
   id: nested_spec_rule

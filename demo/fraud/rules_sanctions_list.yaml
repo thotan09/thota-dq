@@ -1,5 +1,5 @@
 rules:
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -13,7 +13,7 @@ rules:
     columns:
     - entry_id
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique
@@ -27,7 +27,7 @@ rules:
     columns:
     - entry_id
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -41,7 +41,7 @@ rules:
     columns:
     - name
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -55,7 +55,7 @@ rules:
     columns:
     - country_code
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -73,7 +73,7 @@ rules:
     columns:
     - list_type
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: delisted_at IS NULL OR delisted_at > listed_at
@@ -86,7 +86,7 @@ rules:
     version: 1.0.0
   scope:
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     max_rows: null
@@ -100,7 +100,7 @@ rules:
     version: 1.0.0
   scope:
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT name, COUNT(*) as occurrence_count

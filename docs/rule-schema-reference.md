@@ -1,13 +1,13 @@
 # Rule Schema Reference
 
-All Aegis rules follow a consistent YAML schema anchored on `apiVersion: aegis.dev/v1`.
+All Aegis rules follow a consistent YAML schema anchored on `apiVersion: thota_dq.dev/v1`.
 
 ---
 
 ## Full schema
 
 ```yaml
-apiVersion: aegis.dev/v1
+apiVersion: thota_dq.dev/v1
 kind: DataQualityRule
 
 metadata:

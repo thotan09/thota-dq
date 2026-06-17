@@ -254,13 +254,13 @@ async function validateCurrentFile(
 
     // Warn if apiVersion is not the expected value
     const apiMatch = trimmed.match(/^apiVersion:\s+(\S+)/);
-    if (apiMatch && apiMatch[1] !== "aegis.dev/v1") {
+    if (apiMatch && apiMatch[1] !== "thota_dq.dev/v1") {
       const col = line.indexOf(apiMatch[1]);
       const range = new vscode.Range(i, col, i, col + apiMatch[1].length);
       diagnostics.push(
         new vscode.Diagnostic(
           range,
-          `Expected apiVersion 'aegis.dev/v1', got '${apiMatch[1]}'.`,
+          `Expected apiVersion 'thota_dq.dev/v1', got '${apiMatch[1]}'.`,
           vscode.DiagnosticSeverity.Warning
         )
       );

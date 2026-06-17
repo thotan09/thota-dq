@@ -1,5 +1,5 @@
 rules:
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -13,7 +13,7 @@ rules:
     columns:
     - account_id
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -27,7 +27,7 @@ rules:
     columns:
     - customer_id
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -46,7 +46,7 @@ rules:
     columns:
     - account_type
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -65,7 +65,7 @@ rules:
     columns:
     - status
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: opened_date <= last_activity_date
@@ -78,7 +78,7 @@ rules:
     version: 1.0.0
   scope:
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT a.account_id, a.customer_id, a.country_code, c.country_of_residence,
@@ -101,7 +101,7 @@ rules:
     version: 1.0.0
   scope:
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -115,7 +115,7 @@ rules:
     columns:
     - opened_date
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -129,7 +129,7 @@ rules:
     columns:
     - last_activity_date
     table: accounts
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -143,7 +143,7 @@ rules:
     columns:
     - flag_id
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -157,7 +157,7 @@ rules:
     columns:
     - account_id
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -177,7 +177,7 @@ rules:
     columns:
     - flag_type
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -195,7 +195,7 @@ rules:
     columns:
     - status
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -209,7 +209,7 @@ rules:
     columns:
     - filed_at
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: due_at IS NULL OR due_at >= filed_at
@@ -222,7 +222,7 @@ rules:
     version: 1.0.0
   scope:
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT cf.flag_id, cf.txn_id, cf.account_id\nFROM compliance_flags cf\n\
@@ -237,7 +237,7 @@ rules:
     version: 1.0.0
   scope:
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT cf.flag_id, cf.account_id\nFROM compliance_flags cf\nWHERE NOT\
@@ -251,7 +251,7 @@ rules:
     version: 1.0.0
   scope:
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -265,7 +265,7 @@ rules:
     columns:
     - counterparty_id
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -279,7 +279,7 @@ rules:
     columns:
     - name
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -293,7 +293,7 @@ rules:
     columns:
     - account_number
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -307,7 +307,7 @@ rules:
     columns:
     - bank_code
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -321,7 +321,7 @@ rules:
     columns:
     - country_code
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -339,7 +339,7 @@ rules:
     columns:
     - entity_type
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT c.counterparty_id, c.name
@@ -360,7 +360,7 @@ rules:
     version: 1.0.0
   scope:
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique
@@ -374,7 +374,7 @@ rules:
     columns:
     - counterparty_id
     table: counterparties
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -388,7 +388,7 @@ rules:
     columns:
     - customer_id
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique
@@ -402,7 +402,7 @@ rules:
     columns:
     - customer_id
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -420,7 +420,7 @@ rules:
     columns:
     - kyc_status
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -438,7 +438,7 @@ rules:
     columns:
     - risk_tier
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -452,7 +452,7 @@ rules:
     columns:
     - full_name
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -466,7 +466,7 @@ rules:
     columns:
     - dob
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: (kyc_status = 'verified' AND kyc_verified_at IS NOT NULL) OR (kyc_status
@@ -480,7 +480,7 @@ rules:
     version: 1.0.0
   scope:
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -494,7 +494,7 @@ rules:
     columns:
     - pep_flag
     table: customers
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -508,7 +508,7 @@ rules:
     columns:
     - entry_id
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique
@@ -522,7 +522,7 @@ rules:
     columns:
     - entry_id
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -536,7 +536,7 @@ rules:
     columns:
     - name
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -550,7 +550,7 @@ rules:
     columns:
     - country_code
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -568,7 +568,7 @@ rules:
     columns:
     - list_type
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: delisted_at IS NULL OR delisted_at > listed_at
@@ -581,7 +581,7 @@ rules:
     version: 1.0.0
   scope:
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     max_rows: null
@@ -595,7 +595,7 @@ rules:
     version: 1.0.0
   scope:
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT name, COUNT(*) as occurrence_count
@@ -616,7 +616,7 @@ rules:
     version: 1.0.0
   scope:
     table: sanctions_list
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -630,7 +630,7 @@ rules:
     columns:
     - txn_id
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: unique
@@ -644,7 +644,7 @@ rules:
     columns:
     - txn_id
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: amount_usd > 0
@@ -657,7 +657,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -676,7 +676,7 @@ rules:
     columns:
     - status
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -696,7 +696,7 @@ rules:
     columns:
     - txn_type
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT t.txn_id, t.account_id, t.amount_usd
@@ -717,7 +717,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "WITH structuring_window AS (\n  SELECT\n    account_id,\n    COUNT(*)\
@@ -737,7 +737,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT t.txn_id, t.account_id, t.counterparty_id, cp.name\nFROM transactions\
@@ -753,7 +753,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: 'SELECT t.txn_id, t.account_id, t.amount_usd
@@ -778,7 +778,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "WITH velocity_window AS (\n  SELECT t1.txn_id, t1.account_id, COUNT(t2.txn_id)\
@@ -796,7 +796,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT t.txn_id, t.account_id, a.last_activity_date, t.amount_usd\nFROM\
@@ -813,7 +813,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT t.txn_id, t.account_id, a.opened_date, t.amount_usd\nFROM transactions\
@@ -829,7 +829,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "WITH daily_round_amounts AS (\n  SELECT \n    t.account_id,\n    CAST(t.txn_timestamp\
@@ -849,7 +849,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "WITH counterparty_volumes AS (\n  SELECT \n    t.account_id,\n    t.counterparty_id,\n\
@@ -870,7 +870,7 @@ rules:
     version: 1.0.0
   scope:
     table: transactions
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT t.txn_id, t.account_id, t.country_code, c.country_of_residence\n\

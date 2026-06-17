@@ -311,7 +311,7 @@ class TestValidateCheckSql:
         rules_yaml = tmp_path / "rules.yaml"
         rules_yaml.write_text("""
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_amount_positive
@@ -332,7 +332,7 @@ rules:
         rules_yaml = tmp_path / "rules.yaml"
         rules_yaml.write_text("""
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_bad_sql
@@ -354,7 +354,7 @@ rules:
         rules_yaml = tmp_path / "rules.yaml"
         rules_yaml.write_text("""
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_typo_column
@@ -375,7 +375,7 @@ rules:
         rules_yaml = tmp_path / "rules.yaml"
         rules_yaml.write_text("""
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_not_null

@@ -2,7 +2,7 @@ rules:
 
   # ── ORDERS ─────────────────────────────────────────────────────────────────
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_order_id_not_null
@@ -22,7 +22,7 @@ rules:
         - ETL pipeline failed mid-load and wrote partial records
         - Source system sent records without generating a primary key
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_revenue_non_negative
@@ -42,7 +42,7 @@ rules:
         - Refund logic inverted the sign instead of using the refunds table
         - Currency conversion failure produced a negative value
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_quantity_positive
@@ -61,7 +61,7 @@ rules:
         - Cancelled orders incorrectly set quantity to 0 instead of using status='cancelled'
         - UI allows 0-quantity submissions in edge cases
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_no_future_dates
@@ -80,7 +80,7 @@ rules:
         - Pre-orders being loaded incorrectly
         - Timezone conversion bug shifted dates forward
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_minimum_daily_volume
@@ -97,7 +97,7 @@ rules:
 
   # ── CUSTOMERS ──────────────────────────────────────────────────────────────
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: customers_email_not_null
@@ -117,7 +117,7 @@ rules:
         - Guest checkout flow does not require email
         - CRM migration left legacy records without email
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: customers_email_unique
@@ -137,7 +137,7 @@ rules:
         - Duplicate account creation via different sign-up flows
         - Merge/dedup job failed to consolidate records
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: customers_lifetime_value_non_negative
@@ -156,7 +156,7 @@ rules:
         - Refund processing subtracted from LTV incorrectly
         - LTV calculation bug for customers with 100% refund rate
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: customers_no_future_signup
@@ -177,7 +177,7 @@ rules:
 
   # ── PRODUCTS ───────────────────────────────────────────────────────────────
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: products_sku_not_null
@@ -197,7 +197,7 @@ rules:
         - Product created in PIM before SKU was assigned
         - Draft products accidentally synced to production
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: products_price_positive

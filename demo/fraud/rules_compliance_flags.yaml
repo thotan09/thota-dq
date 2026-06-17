@@ -1,5 +1,5 @@
 rules:
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -13,7 +13,7 @@ rules:
     columns:
     - flag_id
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -27,7 +27,7 @@ rules:
     columns:
     - account_id
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -47,7 +47,7 @@ rules:
     columns:
     - flag_type
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: accepted_values
@@ -65,7 +65,7 @@ rules:
     columns:
     - status
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     type: not_null
@@ -79,7 +79,7 @@ rules:
     columns:
     - filed_at
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     expression: due_at IS NULL OR due_at >= filed_at
@@ -92,7 +92,7 @@ rules:
     version: 1.0.0
   scope:
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT cf.flag_id, cf.txn_id, cf.account_id\nFROM compliance_flags cf\n\
@@ -107,7 +107,7 @@ rules:
     version: 1.0.0
   scope:
     table: compliance_flags
-- apiVersion: aegis.dev/v1
+- apiVersion: thota_dq.dev/v1
   kind: DataQualityRule
   logic:
     query: "SELECT cf.flag_id, cf.account_id\nFROM compliance_flags cf\nWHERE NOT\

@@ -122,7 +122,7 @@ If you ran `aegis init`, edit the generated `pipelines/orders-dq/rules.yaml`. Ot
 ```yaml title="pipelines/orders-dq/rules.yaml"
 rules:
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_order_id_not_null
@@ -141,7 +141,7 @@ rules:
         - ETL pipeline failed mid-load
         - Source system sent partial records
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_revenue_positive
@@ -160,7 +160,7 @@ rules:
         - Refund logic inverted the sign
         - Currency conversion failure
 
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_minimum_rows

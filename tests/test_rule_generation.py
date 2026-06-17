@@ -41,7 +41,7 @@ class TestRuleMetadataVersioning:
     def test_full_rule_roundtrip(self):
         """DataQualityRule with versioning fields survives YAML round-trip."""
         rule_yaml = """
-apiVersion: aegis.dev/v1
+apiVersion: thota_dq.dev/v1
 kind: DataQualityRule
 metadata:
   id: orders_amount_positive
@@ -193,7 +193,7 @@ class TestIntrospectTable:
 _VALID_YAML_RESPONSE = """\
 ```yaml
 rules:
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_amount_positive
@@ -205,7 +205,7 @@ rules:
     logic:
       type: sql_expression
       expression: "amount > 0"
-  - apiVersion: aegis.dev/v1
+  - apiVersion: thota_dq.dev/v1
     kind: DataQualityRule
     metadata:
       id: orders_order_id_not_null
