@@ -49,6 +49,26 @@ async def _ensure_schema(db: aiosqlite.Connection, path: Path) -> None:
         )
         """
     )
+    await db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS decisions (
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_id         TEXT    NOT NULL,
+            timestamp      TEXT    NOT NULL,
+            step           TEXT    NOT NULL,
+            input_summary  TEXT,
+            output_summary TEXT,
+            model          TEXT,
+            input_tokens   INTEGER DEFAULT 0,
+            output_tokens  INTEGER DEFAULT 0,
+            cost_usd       REAL    DEFAULT 0.0,
+            duration_ms    REAL    DEFAULT 0.0
+        )
+        """
+    )
+    await db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_decisions_run_id ON decisions(run_id)"
+    )
     await db.commit()
     _schema_initialized.add(path)
 

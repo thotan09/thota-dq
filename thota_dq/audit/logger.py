@@ -7,33 +7,12 @@ from pathlib import Path
 
 import aiosqlite
 
-from ..memory.store import DB_PATH, _connect, _schema_initialized
+from ..memory.store import DB_PATH, _connect, _ensure_schema
 
 
 async def _ensure_decisions_table(db: aiosqlite.Connection, db_path: Path) -> None:
-    """Create decisions table and index once per process per DB path."""
-    if db_path in _schema_initialized:
-        return
-    await db.execute(
-        """
-        CREATE TABLE IF NOT EXISTS decisions (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            run_id       TEXT    NOT NULL,
-            timestamp    TEXT    NOT NULL,
-            step         TEXT    NOT NULL,
-            input_summary  TEXT,
-            output_summary TEXT,
-            model        TEXT,
-            input_tokens  INTEGER DEFAULT 0,
-            output_tokens INTEGER DEFAULT 0,
-            cost_usd     REAL    DEFAULT 0.0,
-            duration_ms  REAL    DEFAULT 0.0
-        )
-        """
-    )
-    await db.execute("CREATE INDEX IF NOT EXISTS idx_decisions_run_id ON decisions(run_id)")
-    await db.commit()
-    _schema_initialized.add(db_path)
+    """Ensure all tables exist (delegates to the unified schema initializer)."""
+    await _ensure_schema(db, db_path)
 
 
 async def log_decision(
