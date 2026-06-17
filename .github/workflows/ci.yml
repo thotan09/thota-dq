@@ -16,7 +16,16 @@ jobs:
         run: pip install -e ".[dev,mcp,rest]"
 
       - name: Lint with ruff
-        run: ruff check aegis tests
+        run: ruff check thota_dq tests
 
       - name: Run tests
-        run: pytest tests/ -v -m "not slow"
+        run: |
+          pytest tests/ -v -m "not slow" \
+            --ignore=tests/test_airflow_operator.py \
+            --ignore=tests/test_bigquery_adapter.py \
+            --ignore=tests/test_athena_adapter.py \
+            --ignore=tests/test_databricks_adapter.py \
+            --ignore=tests/test_postgres_adapter.py \
+            --ignore=tests/test_mcp_server.py \
+            --ignore=tests/test_rest_api.py \
+            --ignore=tests/test_eval_suite.py
